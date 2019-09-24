@@ -29,10 +29,13 @@
     "watch": "npm run build -- --watch",
     "watch:test": "jest --watch"
   },
-  "dependencies": {},
+  "dependencies": {
+    "moo": "^0.5.0"
+  },
   "devDependencies": {
     "@types/jest": "^23.3.3",
     "@types/node": "^10.11.4",
+    "@types/moo": "^0.5.0",
     "coveralls": "^3.0.2",
     "jest": "^23.6.0",
     "prettier": "^1.14.3",
