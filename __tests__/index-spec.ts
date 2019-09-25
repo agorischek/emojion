@@ -1,6 +1,7 @@
 import { parse } from '../src/index';
 import { load } from './util';
 
+const invalidDoc = load('-1.🙌');
 const emptyDoc = load('0.🙌');
 const onePropertyDoc = load('1.🙌');
 const multiCharacterPropertyDoc = load('2.🙌');
@@ -30,4 +31,10 @@ test('Should lex a document with a numeric key', () => {
 test('Should lex a document with multiple properties', () => {
   const parsed = parse(twoPropertyDoc);
   expect(parsed).toHaveLength(6);
+});
+
+test('Should error on an invalid character', () => {
+  expect(() => {
+    parse(invalidDoc);
+  }).toThrow();
 });
