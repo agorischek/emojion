@@ -1,13 +1,22 @@
-import { characters } from "./characters";
-
-const keyCharactersArray: Array<string> = [];
-Object.keys(characters.key).forEach(key => keyCharactersArray.push(key));
-const keyCharacters = keyCharactersArray.join();
+import { characters } from './characters';
+import { collapseMultiple } from './collapse';
 
 export const patterns = {
   documentEnd: characters.document.end,
   documentIndent: characters.document.indent,
   documentOutdent: characters.document.outdent,
   documentStart: characters.document.start,
-  key: keyCharacters
+  key: collapseMultiple([
+    characters.keys.letters,
+    characters.keys.numbers,
+    characters.keys.modifiers,
+  ]),
+  value: collapseMultiple([
+    characters.values.letters,
+    characters.values.numbers,
+    characters.values.numerals,
+    characters.values.modifiers,
+    characters.values.booleans,
+    characters.values.other,
+  ]),
 };
