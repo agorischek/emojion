@@ -1,4 +1,4 @@
-import { lex } from './lex';
+import { tokenize } from './tokenize';
 import { patterns } from './patterns';
 
-export const parse = (input: string) => lex(patterns, input);
+export const lex = (input: string) => tokenize(patterns, input);
