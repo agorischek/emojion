@@ -1,5 +1,5 @@
 import { characters } from './characters';
-import { collapseMultiple } from './collapse';
+import { collapseMultiple } from './mapper';
 
 export const patterns = {
   documentEnd: characters.document.end,

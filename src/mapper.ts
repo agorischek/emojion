@@ -9,13 +9,13 @@ function makeRegexp(characters: string) {
   return regexp;
 }
 
-export const collapse = function(dict: object) {
+export const collapse = (dict: object) => {
   const concatenation = extractValues(dict);
   const regexp = makeRegexp(concatenation);
   return regexp;
 };
 
-export const collapseMultiple = function(dicts: object[]) {
+export const collapseMultiple = (dicts: object[]) => {
   const valuesArray = dicts.map(x => extractValues(x));
   const concatenation = valuesArray.reduce((acc, val) => acc.concat(val));
   const regexp = makeRegexp(concatenation);

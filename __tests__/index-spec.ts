@@ -1,4 +1,4 @@
-import { lex } from '../src/index';
+import { lex, parse } from '../src/index';
 import { load } from './util';
 
 const invalidDoc = load('-1.🙌');
@@ -37,4 +37,11 @@ test('Should error on an invalid character', () => {
   expect(() => {
     lex(invalidDoc);
   }).toThrow();
+});
+
+test('Should parse an empty document', () => {
+  const parsed = parse(emptyDoc);
+  expect(parsed).toHaveLength(2);
+  expect(parsed[0].value).toBe('🙌');
+  expect(parsed[1].value).toBe('✋');
 });

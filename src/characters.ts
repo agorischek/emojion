@@ -34,6 +34,10 @@ export const characters = {
       y: '🤩',
       z: '🤐',
     },
+    modifiers: {
+      escape: '👟',
+      upperCase: '👠',
+    },
     numbers: {
       0: '🐱',
       1: '😺',
@@ -46,12 +50,12 @@ export const characters = {
       8: '😼',
       9: '🙀',
     },
-    modifiers: {
-      escape: '👟',
-      upperCase: '👠',
-    },
   },
   values: {
+    booleans: {
+      false: '💔',
+      true: '❤️',
+    },
     letters: {
       a: '🐜',
       b: '🐝',
@@ -80,17 +84,9 @@ export const characters = {
       y: '🦃',
       z: '🦓',
     },
-    numerals: {
-      0: '🌻',
-      1: '🌷',
-      2: '🌱',
-      3: '☘️',
-      4: '🍀',
-      5: '🌺',
-      6: '🌾',
-      7: '🌿',
-      8: '🌼',
-      9: '🌹',
+    modifiers: {
+      escape: '🥾',
+      upperCase: '👡',
     },
     numbers: {
       0: '🕛',
@@ -105,13 +101,17 @@ export const characters = {
       9: '🕘',
       decimal: '⛳️',
     },
-    modifiers: {
-      escape: '🥾',
-      upperCase: '👡',
-    },
-    booleans: {
-      true: '❤️',
-      false: '💔',
+    numerals: {
+      0: '🌻',
+      1: '🌷',
+      2: '🌱',
+      3: '☘️',
+      4: '🍀',
+      5: '🌺',
+      6: '🌾',
+      7: '🌿',
+      8: '🌼',
+      9: '🌹',
     },
     other: {
       null: '🕳',
