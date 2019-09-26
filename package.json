@@ -57,7 +57,7 @@
   "jest": {
     "preset": "ts-jest",
     "testPathIgnorePatterns": [
-      "util.ts"
+      "docs.ts"
     ]
   }
 }
