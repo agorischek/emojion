@@ -1,9 +1,12 @@
 import * as nearley from 'nearley';
 import grammar = require('./grammar.js');
 
-export const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+const compiledGrammar = nearley.Grammar.fromCompiled(grammar);
+
+export const parser = new nearley.Parser(compiledGrammar);
 
 export const parse = (input: string) => {
+  const parser = new nearley.Parser(compiledGrammar);
   parser.feed(input);
   return parser.results[0];
 };
