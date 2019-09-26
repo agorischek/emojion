@@ -37,3 +37,16 @@ test('Should parse an empty document', () => {
   expect(parsed[0].value).toBe('🙌');
   expect(parsed[1].value).toBe('✋');
 });
+
+test('Should parse a document with one property', () => {
+  const parsed = parse('🙌😃🐬✋');
+  expect(parsed).toHaveLength(3);
+  expect(parsed[0].value).toBe('🙌');
+  expect(parsed[2].value).toBe('✋');
+});
+
+test('Should parse a document with two properties', () => {
+  const parsed = parse('🙌🥳🌻🦘😻❤️✋');
+  const properties = parsed[1][0][0];
+  expect(properties).toHaveLength(2);
+});
