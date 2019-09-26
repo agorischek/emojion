@@ -1,12 +1,4 @@
 import { lex, parse } from '../src/index';
-import { load } from './util';
-
-const invalidDoc = load('-1.🙌');
-const emptyDoc = load('0.🙌');
-const onePropertyDoc = load('1.🙌');
-const multiCharacterPropertyDoc = load('2.🙌');
-const numericKeyDoc = load('3.🙌');
-const twoPropertyDoc = load('4.🙌');
 
 test('Should lex an empty document', () => {
   const lexed = lex('🙌✋');
