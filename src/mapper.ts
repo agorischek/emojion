@@ -5,7 +5,7 @@ function extractValues(dict: object) {
 }
 
 function makeRegexp(characters: string) {
-  const regexp = new RegExp(`[ ${characters}]+`, 'u');
+  const regexp = new RegExp(`[ ${characters}]`, 'u');
   return regexp;
 }
 

@@ -19,20 +19,15 @@ describe('Lexer', () => {
 
   test('Should lex a document with a multi-character property', () => {
     const lexed = lex('🙌😃🤤🐬🦓✋');
-    expect(lexed).toHaveLength(4);
-    expect(lexed[1].text).toBe('😃🤤');
-    expect(lexed[2].text).toBe('🐬🦓');
+    expect(lexed).toHaveLength(6);
+    expect(lexed[1].text).toBe('😃');
+    expect(lexed[3].text).toBe('🐬');
   });
 
   test('Should lex a document with a numeric key', () => {
     const lexed = lex('🙌🐱😻🐜✋');
-    expect(lexed).toHaveLength(4);
-    expect(lexed[2].text).toBe('🐜');
-  });
-
-  test('Should lex a document with multiple properties', () => {
-    const lexed = lex('🙌🥳🌻🦘😻❤️✋');
-    expect(lexed).toHaveLength(6);
+    expect(lexed).toHaveLength(5);
+    expect(lexed[3].text).toBe('🐜');
   });
 
   test('Should error on an invalid character', () => {
@@ -45,23 +40,31 @@ describe('Lexer', () => {
 describe('Parser', () => {
   test('Should parse an empty document', () => {
     const parsed = parse('🙌✋');
-    expect(parsed).toHaveLength(2);
-    expect(parsed[0].value).toBe('🙌');
-    expect(parsed[1].value).toBe('✋');
+    expect(parsed).toEqual('{}');
   });
 
   test('Should parse a document with one property', () => {
     const parsed = parse('🙌😃🐬✋');
-    expect(parsed).toHaveLength(3);
-    expect(parsed[0].value).toBe('🙌');
-    expect(parsed[1][0][0][0].value).toBe('😃');
-    expect(parsed[1][0][0][1].value).toBe('🐬');
-    expect(parsed[2].value).toBe('✋');
+    expect(parsed).toBe('{"😃":"🐬"}');
   });
 
   test('Should parse a document with two properties', () => {
     const parsed = parse('🙌🥳🌻🤤🕑✋');
-    const properties = parsed[1][0][0];
-    expect(properties).toHaveLength(2);
+    expect(parsed).toBe('{"🥳":"🌻","🤤":🕑}');
+  });
+
+  test('Should parse a document with a subobject', () => {
+    const parsed = parse('🙌🤑👉🤩🕔👈✋');
+    expect(parsed).toBe('{"🤑":{"🤩":🕔}}');
+  });
+
+  test('Should parse a document with two identical subobjects', () => {
+    const parsed = parse('🙌🤑👉🤩🕔👈🤑👉🤩🕔👈✋');
+    expect(parsed).toBe('{"🤑":{"🤩":🕔},"🤑":{"🤩":🕔}}');
+  });
+
+  test('Should parse a document with two different subobjects', () => {
+    const parsed = parse('🙌🤑👉🤩🕔👈🤑👉😿🐋👈✋');
+    expect(parsed).toBe('{"🤑":{"🤩":🕔},"🤑":{"😿":"🐋"}}');
   });
 });

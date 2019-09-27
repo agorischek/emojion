@@ -38,7 +38,7 @@ export const characters = {
       escape: '👟',
       upperCase: '👠',
     },
-    numbers: {
+    numerals: {
       0: '🐱',
       1: '😺',
       2: '😸',

@@ -1,22 +1,18 @@
 import { characters } from './characters';
-import { collapseMultiple } from './mapper';
+import { collapse } from './mapper';
 
 export const patterns = {
   documentEnd: characters.document.end,
   documentIndent: characters.document.indent,
   documentOutdent: characters.document.outdent,
   documentStart: characters.document.start,
-  key: collapseMultiple([
-    characters.keys.letters,
-    characters.keys.numbers,
-    characters.keys.modifiers,
-  ]),
-  value: collapseMultiple([
-    characters.values.letters,
-    characters.values.numbers,
-    characters.values.numerals,
-    characters.values.modifiers,
-    characters.values.booleans,
-    characters.values.other,
-  ]),
+  keyLetter: collapse(characters.keys.letters),
+  keyNumeral: collapse(characters.keys.numerals),
+  keyModifier: characters.keys.modifiers.upperCase,
+  valueLetter: collapse(characters.values.letters),
+  valueNumeral: collapse(characters.values.numerals),
+  valueModifier: characters.values.modifiers.upperCase,
+  number: collapse(characters.values.numbers),
+  null: characters.values.other.null,
+  bool: collapse(characters.values.booleans),
 };
