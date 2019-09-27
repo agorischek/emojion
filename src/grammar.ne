@@ -1,5 +1,5 @@
 @{%
-  const lexer = require('./lexer').lexer
+  const lexer = require('../src/lexer').lexer
 %}
 
 @lexer lexer
