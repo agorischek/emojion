@@ -27,7 +27,7 @@
     "build:grammar": "nearleyc src/grammar.ne -o modules/grammar.ts",
     "build:scripts": "tsc --pretty",
     "start": "npm run build && npm run test",
-    "test": "jest",
+    "test": "npm run build:grammar && jest",
     "coverage": "jest --coverage",
     "watch": "npm run build -- --watch",
     "watch:test": "jest --watch"
