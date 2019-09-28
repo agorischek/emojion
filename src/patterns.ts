@@ -2,7 +2,6 @@ import { characters } from './characters';
 import { collapse, flipMultiple } from './mapper';
 
 export const patterns = {
-  bool: collapse(characters.values.booleans),
   documentEnd: characters.document.end,
   documentIndent: characters.document.indent,
   documentOutdent: characters.document.outdent,
@@ -10,10 +9,12 @@ export const patterns = {
   keyLetter: collapse(characters.keys.letters),
   keyModifier: characters.keys.modifiers.upperCase,
   keyNumeral: collapse(characters.keys.numerals),
-  null: characters.values.other.null,
-  number: collapse(characters.values.numbers),
+  valueBool: collapse(characters.values.booleans),
   valueLetter: collapse(characters.values.letters),
   valueModifier: characters.values.modifiers.upperCase,
+  valueNull: characters.values.other.null,
+
+  valueNumber: collapse(characters.values.numbers),
   valueNumeral: collapse(characters.values.numerals),
 };
 
