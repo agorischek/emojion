@@ -24,7 +24,7 @@
     "prepublishOnly": "npm run build",
     "prebuild": "npm run clean && npm run format && npm run lint && echo Using TypeScript && tsc --version",
     "build": "npm run build:grammar && npm run build:scripts",
-    "build:grammar": "nearleyc src/grammar.ne -o modules/grammar.js",
+    "build:grammar": "nearleyc src/grammar.ne -o modules/grammar.ts",
     "build:scripts": "tsc --pretty",
     "start": "npm run build && npm run test",
     "test": "jest",

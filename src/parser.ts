@@ -1,5 +1,5 @@
 import * as nearley from 'nearley';
-import grammar = require('../modules/grammar.js');
+import grammar from '../modules/grammar';
 
 const compiledGrammar = nearley.Grammar.fromCompiled(grammar);
 

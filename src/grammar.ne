@@ -1,16 +1,9 @@
+@preprocessor typescript
+
 @{%
-  const lexer = require('../src/lexer').lexer
-  const lookUp = require('../src/mapper').lookUp
-  const lookupTable = require('../src/patterns').lookupTable
-  const EMPTYOBJECT = function() { return '{}'; }
-  const WRAPOBJECT = function(d) {return '{' + d[1] + '}'; }
-  const JOIN = function(d){ return d[0].join(","); }
-  const PAIR = function(d){ return d[0] + ':' + d[1]; }
-  const WRAPSTRING = function(d){ return '"' + d[0] + '"'; }
-  const CONVERT = function(d){ return lookUp(d[0]); }
-  const CONVERTUPPER = function(d){ return lookUp(d[1]).toUpperCase(); }
-  const CONCAT = function(d){ return d[0].join(""); }
-  const CONCATWRAPSTRING = function(d){ return '"' + d[0].join("") + '"'; }
+  import { lexer } from '../src/lexer'
+  import { EMPTYOBJECT, WRAPOBJECT, JOIN, PAIR, WRAPSTRING, CONVERT,
+    CONVERTUPPER, CONCAT, CONCATWRAPSTRING } from '../src/postprocessor'
 %}
 
 @lexer lexer
