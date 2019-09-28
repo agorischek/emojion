@@ -2,35 +2,44 @@
   const lexer = require('../src/lexer').lexer
   const lookUp = require('../src/mapper').lookUp
   const lookupTable = require('../src/patterns').lookupTable
+  const EMPTYOBJECT = function() { return '{}'; }
+  const WRAPOBJECT = function(d) {return '{' + d[1] + '}'; }
+  const JOIN = function(d){ return d[0].join(","); }
+  const PAIR = function(d){ return d[0] + ':' + d[1]; }
+  const WRAPSTRING = function(d){ return '"' + d[0] + '"'; }
+  const CONVERT = function(d){ return lookUp(d[0]); }
+  const CONVERTUPPER = function(d){ return lookUp(d[1]).toUpperCase(); }
+  const CONCAT = function(d){ return d[0].join(""); }
+  const CONCATWRAPSTRING = function(d){ return '"' + d[0].join("") + '"'; }
 %}
 
 @lexer lexer
 
-document -> %documentStart %documentEnd {% function(d){return '{}'; } %}
-document -> %documentStart content %documentEnd {% function(d){return '{' + d[1] + '}'; } %}
-content -> property:+ {% function(d){ return d[0].join(","); } %}
-property -> key value {% function(d){ return d[0] + ':' + d[1]; } %}
-property -> key object {% function(d){ return d[0] + ':' + d[1]; }  %}
-object -> %documentIndent content %documentOutdent {% function(d){ return '{' + d[1] + '}'; } %}
-key -> keyCharacter:+ {% function(d){ return '"' + d[0] + '"'; } %}
+document -> %documentStart %documentEnd {% EMPTYOBJECT %}
+document -> %documentStart content %documentEnd {% WRAPOBJECT %}
+content -> property:+ {% JOIN %}
+property -> key value {% PAIR %}
+property -> key object {% PAIR %}
+object -> %documentIndent content %documentOutdent {% WRAPOBJECT %}
+key -> keyCharacter:+ {% WRAPSTRING %}
 keyCharacter ->
     keyLowerCaseLetter
   | keyUpperCaseLetter
   | keyNumeral
-keyLowerCaseLetter -> %keyLetter {% function(d){ return lookUp(d[0]); } %}
-keyUpperCaseLetter -> %keyModifier %keyLetter {% function(d){ return lookUp(d[1]).toUpperCase(); } %}
-keyNumeral -> %keyNumeral {% function(d){ return lookUp(d[0]); } %}
+keyLowerCaseLetter -> %keyLetter {% CONVERT %}
+keyUpperCaseLetter -> %keyModifier %keyLetter {% CONVERTUPPER %}
+keyNumeral -> %keyNumeral {% CONVERT %}
 value ->
     string
-  | number:+ {% function(d){ return d[0].join(""); } %}
-  | %valueBool {% function(d){ return lookUp(d[0]); } %}
-  | %valueNull {% function(d){ return lookUp(d[0]); } %}
-string -> valueStringCharacter:+ {% function(d){ return '"' + d[0].join("") + '"'; } %}
+  | number:+ {% CONCAT %}
+  | %valueBool {% CONVERT %}
+  | %valueNull {% CONVERT %}
+string -> valueStringCharacter:+ {% CONCATWRAPSTRING %}
 valueStringCharacter ->
     valueLowerCaseLetter
   | valueUpperCaseLetter
   | valueNumeral
-valueLowerCaseLetter -> %valueLetter {% function(d){ return lookUp(d[0]); } %}
-valueUpperCaseLetter -> %valueModifier %valueLetter {% function(d){ return lookUp(d[1]).toUpperCase(); } %}
-valueNumeral -> %valueNumeral {% function(d){ return lookUp(d[0]); } %}
-number -> %valueNumber {% function(d){ return lookUp(d[0]); } %}
+valueLowerCaseLetter -> %valueLetter {% CONVERT %}
+valueUpperCaseLetter -> %valueModifier %valueLetter {% CONVERTUPPER %}
+valueNumeral -> %valueNumeral {% CONVERT %}
+number -> %valueNumber {% CONVERT %}
