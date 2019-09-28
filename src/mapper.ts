@@ -1,3 +1,6 @@
+import { invert, merge } from 'lodash';
+import { lookupTable } from './patterns';
+
 function extractValues(dict: object) {
   const values = Object.values(dict);
   const concatenation = values.reduce((acc, val) => acc.concat(val));
@@ -21,3 +24,16 @@ export const collapseMultiple = (dicts: object[]) => {
   const regexp = makeRegexp(concatenation);
   return regexp;
 };
+
+export const flip = (dict: object) => {
+  const flipped = invert(dict);
+  return flipped;
+};
+
+export const flipMultiple = (dicts: object[]) => {
+  const flippedArray = dicts.map(x => flip(x));
+  const merged = flippedArray.reduce((acc, val) => merge(acc, val));
+  return merged;
+};
+
+export const lookUp = (character: string) => lookupTable[character];

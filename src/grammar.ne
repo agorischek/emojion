@@ -1,5 +1,6 @@
 @{%
   const lexer = require('../src/lexer').lexer
+  const lookUp = require('../src/mapper').lookUp
 %}
 
 @lexer lexer
@@ -15,18 +16,19 @@ keyCharacter ->
     keyLowerCaseLetter
   | keyUpperCaseLetter
   | keyNumeral
-keyLowerCaseLetter -> %keyLetter
-keyUpperCaseLetter -> %keyModifier %keyLetter
-keyNumeral -> %keyNumeral
+keyLowerCaseLetter -> %keyLetter {% function(d){ return lookUp(d[0]) ; } %}
+keyUpperCaseLetter -> %keyModifier %keyLetter {% function(d){ return lookUp(d[0]).toUpperCase(); } %}
+keyNumeral -> %keyNumeral {% function(d){ return lookUp(d[0]) ; } %}
 value ->
     string
-  | %number:+
-  | %bool
-  | %null
-string -> valueStringCharacter:+ {% function(d){ return '"' + d[0] + '"'; } %}
+  | %number:+ {% function(d){ return lookUp(d[0]) ; } %}
+  | %bool {% function(d){ return lookUp(d[0]) ; } %}
+  | %null {% function(d){ return lookUp(d[0]) ; } %}
+string -> valueStringCharacter:+ {% function(d){ return '"' + lookUp(d[0]) + '"'; } %}
 valueStringCharacter ->
     valueLowerCaseLetter
   | valueUpperCaseLetter
   | valueNumeral
-valueLowerCaseLetter -> %valueLetter
-valueNumeral -> %valueNumeral
+valueLowerCaseLetter -> %valueLetter {% function(d){ return lookUp(d[0]) ; } %}
+valueUpperCaseLetter -> %valueModifier %valueLetter {% function(d){ return lookUp(d[0]).toUpperCase(); } %}
+valueNumeral -> %valueNumeral {% function(d){ return lookUp(d[0]) ; } %}

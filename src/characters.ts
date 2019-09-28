@@ -99,7 +99,7 @@ export const characters = {
       7: '🕖',
       8: '🕗',
       9: '🕘',
-      decimal: '⛳️',
+      '.': '⛳️',
     },
     numerals: {
       0: '🌻',

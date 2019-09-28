@@ -4,6 +4,7 @@
 function id(x) { return x[0]; }
 
   const lexer = require('../src/lexer').lexer
+  const lookUp = require('../src/mapper').lookUp
 var grammar = {
     Lexer: lexer,
     ParserRules: [
@@ -21,18 +22,18 @@ var grammar = {
     {"name": "keyCharacter", "symbols": ["keyLowerCaseLetter"]},
     {"name": "keyCharacter", "symbols": ["keyUpperCaseLetter"]},
     {"name": "keyCharacter", "symbols": ["keyNumeral"]},
-    {"name": "keyLowerCaseLetter", "symbols": [(lexer.has("keyLetter") ? {type: "keyLetter"} : keyLetter)]},
-    {"name": "keyUpperCaseLetter", "symbols": [(lexer.has("keyModifier") ? {type: "keyModifier"} : keyModifier), (lexer.has("keyLetter") ? {type: "keyLetter"} : keyLetter)]},
-    {"name": "keyNumeral", "symbols": [(lexer.has("keyNumeral") ? {type: "keyNumeral"} : keyNumeral)]},
+    {"name": "keyLowerCaseLetter", "symbols": [(lexer.has("keyLetter") ? {type: "keyLetter"} : keyLetter)], "postprocess": function(d){ return lookUp(d[0]) ; }},
+    {"name": "keyUpperCaseLetter", "symbols": [(lexer.has("keyModifier") ? {type: "keyModifier"} : keyModifier), (lexer.has("keyLetter") ? {type: "keyLetter"} : keyLetter)], "postprocess": function(d){ return lookUp(d[0]).toUpperCase(); }},
+    {"name": "keyNumeral", "symbols": [(lexer.has("keyNumeral") ? {type: "keyNumeral"} : keyNumeral)], "postprocess": function(d){ return lookUp(d[0]) ; }},
     {"name": "value", "symbols": ["string"]},
     {"name": "value$ebnf$1", "symbols": [(lexer.has("number") ? {type: "number"} : number)]},
     {"name": "value$ebnf$1", "symbols": ["value$ebnf$1", (lexer.has("number") ? {type: "number"} : number)], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "value", "symbols": ["value$ebnf$1"]},
-    {"name": "value", "symbols": [(lexer.has("bool") ? {type: "bool"} : bool)]},
-    {"name": "value", "symbols": [(lexer.has("null") ? {type: "null"} : null)]},
+    {"name": "value", "symbols": ["value$ebnf$1"], "postprocess": function(d){ return lookUp(d[0]) ; }},
+    {"name": "value", "symbols": [(lexer.has("bool") ? {type: "bool"} : bool)], "postprocess": function(d){ return lookUp(d[0]) ; }},
+    {"name": "value", "symbols": [(lexer.has("null") ? {type: "null"} : null)], "postprocess": function(d){ return lookUp(d[0]) ; }},
     {"name": "string$ebnf$1", "symbols": ["valueStringCharacter"]},
     {"name": "string$ebnf$1", "symbols": ["string$ebnf$1", "valueStringCharacter"], "postprocess": function arrpush(d) {return d[0].concat([d[1]]);}},
-    {"name": "string", "symbols": ["string$ebnf$1"], "postprocess": function(d){ return '"' + d[0] + '"'; }},
+    {"name": "string", "symbols": ["string$ebnf$1"], "postprocess": function(d){ return '"' + lookUp(d[0]) + '"'; }},
     {"name": "valueStringCharacter", "symbols": ["valueLowerCaseLetter"]},
     {"name": "valueStringCharacter", "symbols": ["valueUpperCaseLetter"]},
     {"name": "valueStringCharacter", "symbols": ["valueNumeral"]},
