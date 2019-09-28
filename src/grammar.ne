@@ -3,7 +3,7 @@
 @{%
   import { lexer } from '../src/lexer'
   import { EMPTYOBJECT, WRAPOBJECT, JOIN, PAIR, WRAPSTRING, CONVERT,
-    CONVERTUPPER, CONCAT, CONCATWRAPSTRING } from '../src/postprocessor'
+    CONVERTUPPER, CONCAT, CONCATWRAPSTRING, COLLAPSEARRAY, TAKESECOND } from '../src/postprocessor'
 %}
 
 @lexer lexer
@@ -23,10 +23,14 @@ keyLowerCaseLetter -> %keyLetter {% CONVERT %}
 keyUpperCaseLetter -> %keyModifier %keyLetter {% CONVERTUPPER %}
 keyNumeral -> %keyNumeral {% CONVERT %}
 value ->
-    string
+    array
+  | string
   | number:+ {% CONCAT %}
   | %valueBool {% CONVERT %}
   | %valueNull {% CONVERT %}
+array -> %arrayOpen initialArrayItem additionalArrayItem:* %arrayClose {% COLLAPSEARRAY %}
+initialArrayItem -> value
+additionalArrayItem -> %arrayDelimit value {% TAKESECOND %}
 string -> valueStringCharacter:+ {% CONCATWRAPSTRING %}
 valueStringCharacter ->
     valueLowerCaseLetter

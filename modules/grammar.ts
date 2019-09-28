@@ -12,6 +12,9 @@ declare var keyModifier: any;
 declare var keyNumeral: any;
 declare var valueBool: any;
 declare var valueNull: any;
+declare var arrayOpen: any;
+declare var arrayClose: any;
+declare var arrayDelimit: any;
 declare var valueLetter: any;
 declare var valueModifier: any;
 declare var valueNumeral: any;
@@ -19,7 +22,7 @@ declare var valueNumber: any;
 
   import { lexer } from '../src/lexer'
   import { EMPTYOBJECT, WRAPOBJECT, JOIN, PAIR, WRAPSTRING, CONVERT,
-    CONVERTUPPER, CONCAT, CONCATWRAPSTRING } from '../src/postprocessor'
+    CONVERTUPPER, CONCAT, CONCATWRAPSTRING, COLLAPSEARRAY, TAKESECOND } from '../src/postprocessor'
 
 interface NearleyToken {  value: any;
   [key: string]: any;
@@ -67,12 +70,18 @@ const grammar: Grammar = {
     {"name": "keyLowerCaseLetter", "symbols": [(lexer.has("keyLetter") ? {type: "keyLetter"} : keyLetter)], "postprocess": CONVERT},
     {"name": "keyUpperCaseLetter", "symbols": [(lexer.has("keyModifier") ? {type: "keyModifier"} : keyModifier), (lexer.has("keyLetter") ? {type: "keyLetter"} : keyLetter)], "postprocess": CONVERTUPPER},
     {"name": "keyNumeral", "symbols": [(lexer.has("keyNumeral") ? {type: "keyNumeral"} : keyNumeral)], "postprocess": CONVERT},
+    {"name": "value", "symbols": ["array"]},
     {"name": "value", "symbols": ["string"]},
     {"name": "value$ebnf$1", "symbols": ["number"]},
     {"name": "value$ebnf$1", "symbols": ["value$ebnf$1", "number"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "value", "symbols": ["value$ebnf$1"], "postprocess": CONCAT},
     {"name": "value", "symbols": [(lexer.has("valueBool") ? {type: "valueBool"} : valueBool)], "postprocess": CONVERT},
     {"name": "value", "symbols": [(lexer.has("valueNull") ? {type: "valueNull"} : valueNull)], "postprocess": CONVERT},
+    {"name": "array$ebnf$1", "symbols": []},
+    {"name": "array$ebnf$1", "symbols": ["array$ebnf$1", "additionalArrayItem"], "postprocess": (d) => d[0].concat([d[1]])},
+    {"name": "array", "symbols": [(lexer.has("arrayOpen") ? {type: "arrayOpen"} : arrayOpen), "initialArrayItem", "array$ebnf$1", (lexer.has("arrayClose") ? {type: "arrayClose"} : arrayClose)], "postprocess": COLLAPSEARRAY},
+    {"name": "initialArrayItem", "symbols": ["value"]},
+    {"name": "additionalArrayItem", "symbols": [(lexer.has("arrayDelimit") ? {type: "arrayDelimit"} : arrayDelimit), "value"], "postprocess": TAKESECOND},
     {"name": "string$ebnf$1", "symbols": ["valueStringCharacter"]},
     {"name": "string$ebnf$1", "symbols": ["string$ebnf$1", "valueStringCharacter"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "string", "symbols": ["string$ebnf$1"], "postprocess": CONCATWRAPSTRING},

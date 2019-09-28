@@ -27,3 +27,13 @@ export const CONCAT = (d: any) => {
 export const CONCATWRAPSTRING = (d: any) => {
   return '"' + d[0].join('') + '"';
 };
+export const TAKESECOND = (d: any) => {
+  return d[1];
+};
+export const COLLAPSEARRAY = (d: any) => {
+  if (d[2][0]) {
+    return '[' + d[1] + ',' + d[2].join(',') + ']';
+  } else {
+    return '[' + d[1] + ']';
+  }
+};

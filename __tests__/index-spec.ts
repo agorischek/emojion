@@ -103,6 +103,46 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
+  test('Should parse a document with a one-item array', () => {
+    const document = '🙌😉🤜🕗🤛✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"w":[8]}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with a two-item array', () => {
+    const document = '🙌😉🤜🕗🤝🕔🤛✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"w":[8,5]}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with a three-item array', () => {
+    const document = '🙌😉🤜🕗🤝🕔🤝🕒🤛✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"w":[8,5,3]}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with a complex array', () => {
+    const document = '🙌😉🤜🕗🕒🤝🌾🌿🌼🤝🕳🤝🦘🦞🤛✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"w":[83,"678",null,"kl"]}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with nested arrays', () => {
+    const document = '🙌😉🤜🕗🤝🤜🕔🤝🕑🤛🤝🕒🤛✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"w":[8,[5,2],3]}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
   test('Should parse a document with a subobject', () => {
     const document = '🙌🤑👉🤩🕔👈✋';
     const parsed = parse(document);

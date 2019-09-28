@@ -1,5 +1,8 @@
 export const characters = {
   document: {
+    arrayClose: '🤛',
+    arrayDelimit: '🤝',
+    arrayOpen: '🤜',
     end: '✋',
     indent: '👉',
     outdent: '👈',

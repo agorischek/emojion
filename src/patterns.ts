@@ -2,6 +2,9 @@ import { characters } from './characters';
 import { collapse, flipMultiple } from './mapper';
 
 export const patterns = {
+  arrayClose: characters.document.arrayClose,
+  arrayDelimit: characters.document.arrayDelimit,
+  arrayOpen: characters.document.arrayOpen,
   documentEnd: characters.document.end,
   documentIndent: characters.document.indent,
   documentOutdent: characters.document.outdent,
