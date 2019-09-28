@@ -71,10 +71,26 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
+  test('Should parse a document with a multicharacter string value', () => {
+    const document = '🙌🤫🐜🐢🐌✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"q":"ats"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
   test('Should parse a document with a multicharacter numeric value', () => {
     const document = '🙌😖🕑🕒🕔✋';
     const parsed = parse(document);
     expect(parsed).toBe('{"c":235}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with upper case letters', () => {
+    const document = '🙌👠🥰👡🐂✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"L":"X"}');
     validateJSON(parsed);
     validateGrammar(document);
   });

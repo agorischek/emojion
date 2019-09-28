@@ -8,7 +8,7 @@
 
 document -> %documentStart %documentEnd {% function(d){return '{}'; } %}
 document -> %documentStart content %documentEnd {% function(d){return '{' + d[1] + '}'; } %}
-content -> property:+
+content -> property:+ {% function(d){ return d[0].join(","); } %}
 property -> key value {% function(d){ return d[0] + ':' + d[1]; } %}
 property -> key object {% function(d){ return d[0] + ':' + d[1]; }  %}
 object -> %documentIndent content %documentOutdent {% function(d){ return '{' + d[1] + '}'; } %}
@@ -25,7 +25,7 @@ value ->
   | number:+ {% function(d){ return d[0].join(""); } %}
   | %valueBool {% function(d){ return lookUp(d[0]); } %}
   | %valueNull {% function(d){ return lookUp(d[0]); } %}
-string -> valueStringCharacter:+ {% function(d){ return '"' + d[0] + '"'; } %}
+string -> valueStringCharacter:+ {% function(d){ return '"' + d[0].join("") + '"'; } %}
 valueStringCharacter ->
     valueLowerCaseLetter
   | valueUpperCaseLetter

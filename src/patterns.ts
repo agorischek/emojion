@@ -13,7 +13,6 @@ export const patterns = {
   valueLetter: collapse(characters.values.letters),
   valueModifier: characters.values.modifiers.upperCase,
   valueNull: characters.values.other.null,
-
   valueNumber: collapse(characters.values.numbers),
   valueNumeral: collapse(characters.values.numerals),
 };
