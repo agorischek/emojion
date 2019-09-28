@@ -71,6 +71,14 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
+  test.skip('Should parse a document with whitespace', () => {
+    const document = '🙌😃  🐬✋ ';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"h":"d"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
   test('Should parse a document with a multicharacter string value', () => {
     const document = '🙌🤫🐜🐢🐌✋';
     const parsed = parse(document);
