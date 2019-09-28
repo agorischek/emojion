@@ -71,6 +71,20 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
+  test('Should parse a document that is only a boolean', () => {
+    const document = '🙌💔✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('false');
+    validateGrammar(document);
+  });
+
+  test('Should parse a document that is only an array', () => {
+    const document = '🙌🤜🐜🤝🐢🤝🐌🤛✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('["a","t","s"]');
+    validateGrammar(document);
+  });
+
   test.skip('Should parse a document with whitespace', () => {
     const document = '🙌😃  🐬✋ ';
     const parsed = parse(document);

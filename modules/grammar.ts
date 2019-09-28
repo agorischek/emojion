@@ -5,13 +5,13 @@
 function id(d: any[]): any { return d[0]; }
 declare var documentStart: any;
 declare var documentEnd: any;
+declare var valueBool: any;
+declare var valueNull: any;
 declare var documentIndent: any;
 declare var documentOutdent: any;
 declare var keyLetter: any;
 declare var keyModifier: any;
 declare var keyNumeral: any;
-declare var valueBool: any;
-declare var valueNull: any;
 declare var arrayOpen: any;
 declare var arrayClose: any;
 declare var arrayDelimit: any;
@@ -21,8 +21,11 @@ declare var valueNumeral: any;
 declare var valueNumber: any;
 
   import { lexer } from '../src/lexer'
-  import { EMPTYOBJECT, WRAPOBJECT, JOIN, PAIR, WRAPSTRING, CONVERT,
-    CONVERTUPPER, CONCAT, CONCATWRAPSTRING, COLLAPSEARRAY, TAKESECOND } from '../src/postprocessor'
+  import {
+    EMPTYOBJECT, PAIR, WRAPSTRING, CONVERT,
+    CONVERTUPPER, CONCAT, CONCATWRAPSTRING, COLLAPSEARRAY, TAKESECOND,
+    SELF, ASSEMBLEOBJECT
+    } from '../src/postprocessor'
 
 interface NearleyToken {  value: any;
   [key: string]: any;
@@ -54,13 +57,17 @@ const grammar: Grammar = {
   Lexer: lexer,
   ParserRules: [
     {"name": "document", "symbols": [(lexer.has("documentStart") ? {type: "documentStart"} : documentStart), (lexer.has("documentEnd") ? {type: "documentEnd"} : documentEnd)], "postprocess": EMPTYOBJECT},
-    {"name": "document", "symbols": [(lexer.has("documentStart") ? {type: "documentStart"} : documentStart), "content", (lexer.has("documentEnd") ? {type: "documentEnd"} : documentEnd)], "postprocess": WRAPOBJECT},
-    {"name": "content$ebnf$1", "symbols": ["property"]},
-    {"name": "content$ebnf$1", "symbols": ["content$ebnf$1", "property"], "postprocess": (d) => d[0].concat([d[1]])},
-    {"name": "content", "symbols": ["content$ebnf$1"], "postprocess": JOIN},
+    {"name": "document", "symbols": [(lexer.has("documentStart") ? {type: "documentStart"} : documentStart), "content", (lexer.has("documentEnd") ? {type: "documentEnd"} : documentEnd)], "postprocess": TAKESECOND},
+    {"name": "content", "symbols": ["properties"], "postprocess": SELF},
+    {"name": "content", "symbols": ["array"], "postprocess": SELF},
+    {"name": "content", "symbols": [(lexer.has("valueBool") ? {type: "valueBool"} : valueBool)], "postprocess": CONVERT},
+    {"name": "content", "symbols": [(lexer.has("valueNull") ? {type: "valueNull"} : valueNull)], "postprocess": CONVERT},
+    {"name": "properties$ebnf$1", "symbols": ["property"]},
+    {"name": "properties$ebnf$1", "symbols": ["properties$ebnf$1", "property"], "postprocess": (d) => d[0].concat([d[1]])},
+    {"name": "properties", "symbols": ["properties$ebnf$1"], "postprocess": ASSEMBLEOBJECT},
     {"name": "property", "symbols": ["key", "value"], "postprocess": PAIR},
     {"name": "property", "symbols": ["key", "object"], "postprocess": PAIR},
-    {"name": "object", "symbols": [(lexer.has("documentIndent") ? {type: "documentIndent"} : documentIndent), "content", (lexer.has("documentOutdent") ? {type: "documentOutdent"} : documentOutdent)], "postprocess": WRAPOBJECT},
+    {"name": "object", "symbols": [(lexer.has("documentIndent") ? {type: "documentIndent"} : documentIndent), "properties", (lexer.has("documentOutdent") ? {type: "documentOutdent"} : documentOutdent)], "postprocess": TAKESECOND},
     {"name": "key$ebnf$1", "symbols": ["keyCharacter"]},
     {"name": "key$ebnf$1", "symbols": ["key$ebnf$1", "keyCharacter"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "key", "symbols": ["key$ebnf$1"], "postprocess": WRAPSTRING},

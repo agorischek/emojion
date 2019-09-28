@@ -2,18 +2,26 @@
 
 @{%
   import { lexer } from '../src/lexer'
-  import { EMPTYOBJECT, WRAPOBJECT, JOIN, PAIR, WRAPSTRING, CONVERT,
-    CONVERTUPPER, CONCAT, CONCATWRAPSTRING, COLLAPSEARRAY, TAKESECOND } from '../src/postprocessor'
+  import {
+    EMPTYOBJECT, PAIR, WRAPSTRING, CONVERT,
+    CONVERTUPPER, CONCAT, CONCATWRAPSTRING, COLLAPSEARRAY, TAKESECOND,
+    SELF, ASSEMBLEOBJECT
+    } from '../src/postprocessor'
 %}
 
 @lexer lexer
 
 document -> %documentStart %documentEnd {% EMPTYOBJECT %}
-document -> %documentStart content %documentEnd {% WRAPOBJECT %}
-content -> property:+ {% JOIN %}
+document -> %documentStart content %documentEnd {% TAKESECOND %}
+content ->
+    properties {% SELF %}
+  | array {% SELF %}
+  | %valueBool {% CONVERT %}
+  | %valueNull {% CONVERT %}
+properties -> property:+ {% ASSEMBLEOBJECT %}
 property -> key value {% PAIR %}
 property -> key object {% PAIR %}
-object -> %documentIndent content %documentOutdent {% WRAPOBJECT %}
+object -> %documentIndent properties %documentOutdent {% TAKESECOND %}
 key -> keyCharacter:+ {% WRAPSTRING %}
 keyCharacter ->
     keyLowerCaseLetter

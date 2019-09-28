@@ -4,7 +4,7 @@ export const EMPTYOBJECT = () => {
   return '{}';
 };
 export const WRAPOBJECT = (d: any) => {
-  return '{' + d[1] + '}';
+  return '{' + d[0] + '}';
 };
 export const JOIN = (d: any) => {
   return d[0].join(',');
@@ -27,6 +27,9 @@ export const CONCAT = (d: any) => {
 export const CONCATWRAPSTRING = (d: any) => {
   return '"' + d[0].join('') + '"';
 };
+export const SELF = (d: any) => {
+  return d[0];
+};
 export const TAKESECOND = (d: any) => {
   return d[1];
 };
@@ -36,4 +39,7 @@ export const COLLAPSEARRAY = (d: any) => {
   } else {
     return '[' + d[1] + ']';
   }
+};
+export const ASSEMBLEOBJECT = (d: any) => {
+  return '{' + d[0].join(',') + '}';
 };
