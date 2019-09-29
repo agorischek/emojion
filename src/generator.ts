@@ -46,12 +46,20 @@ const processValue = (input: any) => {
   }
 };
 
-const processObject = (input: object) => {
-  const converted: string[] = [];
+const processObject = (input: object, isRoot: boolean) => {
+  const convertedProperties: string[] = [];
   forOwn(input, (value, key) => {
-    converted.push(processProperty({ key: key, value: value }));
+    convertedProperties.push(processProperty({ key: key, value: value }));
   });
-  return converted;
+  if (isRoot) {
+    return convertedProperties;
+  } else {
+    return (
+      characters.document.indent +
+      convertedProperties +
+      characters.document.outdent
+    );
+  }
 };
 
 interface Property {
