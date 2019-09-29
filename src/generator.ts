@@ -75,8 +75,10 @@ const processProperty = (input: Property) => {
 };
 
 const processArray = (input: []) => {
-  const converted = input.map(x => x).join(characters.document.arrayDelimit);
-  const generated =
+  const converted = input
+    .map(x => processValue(x))
+    .join(characters.document.arrayDelimit);
+  const generated: string =
     characters.document.arrayOpen + converted + characters.document.arrayClose;
   return generated;
 };
