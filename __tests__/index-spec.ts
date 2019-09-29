@@ -1,4 +1,4 @@
-import { lex, parse } from '../src/index';
+import { lex, parse, generate } from '../src/index';
 import { validateGrammar } from '../src/parser';
 
 const validateJSON = (document: string) =>
@@ -71,10 +71,23 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
+  // test('Should parse a document with a floating point value', () => {
+  //   const document = '🙌😭🕓🕖⛳️🕗🕐✋';
+  //   const lexed = lex(document);
+  //   console.log(lexed);
+  //   console.log(lexed[4].toString());
+  //
+  //   console.log(lexed[5].toString());
+  //   const parsed = parse(document);
+  //   expect(parsed).toBe('{"r":47.81}');
+  //   validateJSON(parsed);
+  //   validateGrammar(document);
+  // });
+
   test('Should parse a document that is only a boolean', () => {
-    const document = '🙌💔✋';
+    const document = '🙌💚✋';
     const parsed = parse(document);
-    expect(parsed).toBe('false');
+    expect(parsed).toBe('true');
     validateGrammar(document);
   });
 
@@ -82,14 +95,6 @@ describe('Parser', () => {
     const document = '🙌🤜🐜🤝🐢🤝🐌🤛✋';
     const parsed = parse(document);
     expect(parsed).toBe('["a","t","s"]');
-    validateGrammar(document);
-  });
-
-  test.skip('Should parse a document with whitespace', () => {
-    const document = '🙌😃  🐬✋ ';
-    const parsed = parse(document);
-    expect(parsed).toBe('{"h":"d"}');
-    validateJSON(parsed);
     validateGrammar(document);
   });
 
@@ -179,5 +184,37 @@ describe('Parser', () => {
     expect(parsed).toBe('{"m":{"y":5},"m":{"6":"w"}}');
     validateJSON(parsed);
     validateGrammar(document);
+  });
+});
+
+describe('Generator', () => {
+  test('Should return a true boolean', () => {
+    const generated = generate('true');
+    expect(generated).toBe('🙌💚✋');
+  });
+
+  test('Should return a false boolean', () => {
+    const generated = generate('false');
+    expect(generated).toBe('🙌💔✋');
+  });
+
+  test('Should return a null', () => {
+    const generated = generate('null');
+    expect(generated).toBe('🙌🕳✋');
+  });
+
+  test('Should return an empty document', () => {
+    const generated = generate('{}');
+    expect(generated).toBe('🙌✋');
+  });
+
+  test('Should return a simple object', () => {
+    const generated = generate('{"a":"a"}');
+    expect(generated).toBe('🙌😠🐜✋');
+  });
+
+  test('Should return an empty array', () => {
+    const generated = generate('[]');
+    expect(generated).toBe('🙌🤜🤛✋');
   });
 });
