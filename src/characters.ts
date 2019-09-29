@@ -57,7 +57,7 @@ export const characters = {
   values: {
     booleans: {
       false: '💔',
-      true: '❤️',
+      true: '💚',
     },
     letters: {
       a: '🐜',
