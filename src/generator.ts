@@ -15,7 +15,7 @@ export const generate = (input: any) => {
 const processDocument = (input: any) => {
   const type = typeOf(input);
   if (type === 'object') {
-    return processObject(input);
+    return processObject(input, true);
   } else if (type === 'array') {
     return processArray(input);
   } else if (type === 'boolean') {
@@ -30,7 +30,7 @@ const processDocument = (input: any) => {
 const processValue = (input: any) => {
   const type = typeOf(input);
   if (type === 'object') {
-    return processObject(input);
+    return processObject(input, false);
   } else if (type === 'array') {
     return processArray(input);
   } else if (type === 'string') {

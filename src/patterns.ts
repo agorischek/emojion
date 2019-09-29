@@ -1,6 +1,6 @@
 import { characters } from './characters';
 import { collapse, flipMultiple } from './mapper';
-// import { cloneDeep, merge } from 'lodash';
+import { merge } from 'lodash';
 
 export const patterns = {
   arrayClose: characters.document.arrayClose,
@@ -32,12 +32,7 @@ export const lookupTable = flipMultiple([
 ]);
 
 export const conversionTable: any = {
-  keys: {
-    a: '😠',
-    b: '🥺',
-  },
-  strings: {
-    a: '🐜',
-    b: '🐝',
-  },
+  keys: merge({}, characters.keys.letters, characters.keys.numerals),
+  strings: merge({}, characters.values.letters, characters.values.numerals),
+  numbers: characters.values.numbers,
 };
