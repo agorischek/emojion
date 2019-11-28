@@ -1,50 +1,8 @@
-import { lex, parse, generate } from '../src/index';
+import { parse } from '../src/index';
 import { validateGrammar } from '../src/parser';
 
 const validateJSON = (document: string) =>
   expect(JSON.parse(document)).toBeTruthy();
-
-describe('Lexer', () => {
-  test('Should lex an empty document', () => {
-    const document = '🙌✋';
-    const lexed = lex(document);
-    expect(lexed).toHaveLength(2);
-    expect(lexed[0].text).toBe('🙌');
-    expect(lexed[1].text).toBe('✋');
-  });
-
-  test('Should lex a document with one property', () => {
-    const document = '🙌😃🕔✋';
-    const lexed = lex(document);
-    expect(lexed).toHaveLength(4);
-    expect(lexed[0].text).toBe('🙌');
-    expect(lexed[1].text).toBe('😃');
-    expect(lexed[2].text).toBe('🕔');
-    expect(lexed[3].text).toBe('✋');
-  });
-
-  test('Should lex a document with a multi-character property', () => {
-    const document = '🙌😃🤤🐬🦓✋';
-    const lexed = lex(document);
-    expect(lexed).toHaveLength(6);
-    expect(lexed[1].text).toBe('😃');
-    expect(lexed[3].text).toBe('🐬');
-  });
-
-  test('Should lex a document with a numeric key', () => {
-    const document = '🙌🐱😻🐜✋';
-    const lexed = lex(document);
-    expect(lexed).toHaveLength(5);
-    expect(lexed[3].text).toBe('🐜');
-  });
-
-  test('Should error on an invalid character', () => {
-    const document = '💩';
-    expect(() => {
-      lex(document);
-    }).toThrow();
-  });
-});
 
 describe('Parser', () => {
   test('Should parse an empty document', () => {
@@ -184,68 +142,5 @@ describe('Parser', () => {
     expect(parsed).toBe('{"m":{"y":5},"m":{"6":"w"}}');
     validateJSON(parsed);
     validateGrammar(document);
-  });
-});
-
-describe('Generator', () => {
-  test('Should return a true boolean', () => {
-    const generated = generate('true');
-    expect(generated).toBe('🙌💚✋');
-  });
-
-  test('Should return a false boolean', () => {
-    const generated = generate('false');
-    expect(generated).toBe('🙌💔✋');
-  });
-
-  test('Should return a null', () => {
-    const generated = generate('null');
-    expect(generated).toBe('🙌🕳✋');
-  });
-
-  test('Should return an empty document', () => {
-    const generated = generate('{}');
-    expect(generated).toBe('🙌✋');
-  });
-
-  test('Should return a simple object', () => {
-    const generated = generate('{"a":"a"}');
-
-    expect(generated).toBe('🙌😠🐜✋');
-  });
-
-  test('Should return an object with a numeric value', () => {
-    const generated = generate('{"a":1}');
-    expect(generated).toBe('🙌😠🕐✋');
-  });
-
-  test('Should return an object with a floating point numeric value', () => {
-    const generated = generate('{"a":1.1}');
-    expect(generated).toBe('🙌😠🕐⛳️🕐✋');
-  });
-
-  test('Should return an empty array', () => {
-    const generated = generate('[]');
-    expect(generated).toBe('🙌🤜🤛✋');
-  });
-
-  test('Should return a single-value array', () => {
-    const generated = generate('[2]');
-    expect(generated).toBe('🙌🤜🕑🤛✋');
-  });
-
-  test('Should return a two-value array', () => {
-    const generated = generate('[2, 1]');
-    expect(generated).toBe('🙌🤜🕑🤝🕐🤛✋');
-  });
-
-  test('Should return a nested array', () => {
-    const generated = generate('[2, [1,2]]');
-    expect(generated).toBe('🙌🤜🕑🤝🤜🕐🤝🕑🤛🤛✋');
-  });
-
-  test('Should return a nested object', () => {
-    const generated = generate('{"a":{"b":2}}');
-    expect(generated).toBe('🙌😠👉🥺🕑👈✋');
   });
 });
