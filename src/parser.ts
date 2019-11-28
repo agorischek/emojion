@@ -1,5 +1,5 @@
 import * as nearley from 'nearley';
-import grammar from '../modules/grammar';
+import grammar from '../gen/grammar';
 
 const compiledGrammar = nearley.Grammar.fromCompiled(grammar);
 
