@@ -25,33 +25,38 @@
     "prebuild": "npm run clean && npm run format && npm run lint && echo Using TypeScript && tsc --version",
     "build": "npm run build:grammar && npm run build:scripts",
     "build:grammar": "nearleyc src/grammar.ne -o gen/grammar.ts && replace-in-file \"Lexer: lexer,\" \"// @ts-ignore\nLexer: lexer,\" gen/grammar.ts",
-    "build:scripts": "tsc --pretty",
+    "build:scripts": "npm run lint && npm run rollup",
     "start": "npm run build && npm run test",
     "test": "npm run build:grammar && jest",
     "coverage": "jest --coverage",
     "update": "ncu -u && npm i && npm audit fix",
+    "rollup": "rollup --config",
     "watch": "npm run build -- --watch",
     "watch:test": "jest --watch"
   },
-  "dependencies": {
-    "lodash": "^4.17.15",
-    "moo": "^0.5.1",
-    "nearley": "^2.19.0",
-    "npm-check-updates": "^3.2.2",
-    "replace-in-file": "^4.2.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/jest": "^24.0.23",
     "@types/lodash": "^4.14.149",
     "@types/moo": "^0.5.0",
     "@types/nearley": "^2.11.0",
     "@types/node": "^12.12.14",
+    "lodash": "^4.17.15",
+    "moo": "^0.5.1",
+    "nearley": "^2.19.0",
     "coveralls": "^3.0.9",
     "jest": "^24.9.0",
+    "npm-check-updates": "^3.2.2",
     "prettier": "^1.19.1",
+    "replace-in-file": "^4.2.0",
     "rimraf": "^3.0.0",
+    "rollup": "^1.27.5",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript": "^1.0.1",
     "ts-jest": "^24.2.0",
     "ts-node": "^8.5.2",
+    "tslib": "^1.10.0",
     "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.7.2"
@@ -60,9 +65,6 @@
     "node": ">=10.0.0"
   },
   "jest": {
-    "preset": "ts-jest",
-    "testPathIgnorePatterns": [
-      "docs.ts"
-    ]
+    "preset": "ts-jest"
   }
 }
