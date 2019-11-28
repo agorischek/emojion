@@ -1,4 +1,4 @@
-import * as moo from '../modules/moo';
+import * as moo from 'moo';
 import { patterns } from './patterns';
 
 export const lexer = moo.compile(patterns);
