@@ -1,6 +1,6 @@
 import { characters } from './characters';
 import { collapse, flipMultiple } from './mapper';
-import { merge } from 'lodash';
+import { merge, forEach } from 'lodash';
 
 export const patterns = {
   arrayClose: characters.document.arrayClose,
@@ -31,8 +31,30 @@ export const lookupTable = flipMultiple([
   characters.values.booleans,
 ]);
 
+const keyUpperLetters: any = {};
+forEach(characters.keys.letters, (value, key) => {
+  keyUpperLetters[key.toUpperCase()] =
+    characters.keys.modifiers.upperCase + value;
+});
+
+const valueUpperLetters: any = {};
+forEach(characters.values.letters, (value, key) => {
+  valueUpperLetters[key.toUpperCase()] =
+    characters.values.modifiers.upperCase + value;
+});
+
 export const conversionTable: any = {
-  keys: merge({}, characters.keys.letters, characters.keys.numerals),
-  strings: merge({}, characters.values.letters, characters.values.numerals),
+  keys: merge(
+    {},
+    characters.keys.letters,
+    keyUpperLetters,
+    characters.keys.numerals
+  ),
+  strings: merge(
+    {},
+    characters.values.letters,
+    valueUpperLetters,
+    characters.values.numerals
+  ),
   numbers: characters.values.numbers,
 };
