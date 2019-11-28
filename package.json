@@ -1,12 +1,12 @@
 {
   "name": "emojion",
-  "version": "0.0.0",
-  "description": "emojion",
+  "version": "0.0.1",
+  "description": "Emoji Object Notation",
   "license": "MIT",
   "repository": "",
   "author": {
-    "name": "",
-    "email": "",
+    "name": "Alex Gorischek",
+    "email": "alex.gorischek@gmail.com",
     "url": ""
   },
   "keywords": [
