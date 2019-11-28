@@ -29,6 +29,7 @@
     "start": "npm run build && npm run test",
     "test": "npm run build:grammar && jest",
     "coverage": "jest --coverage",
+    "update": "ncu -u && npm i && npm audit fix",
     "watch": "npm run build -- --watch",
     "watch:test": "jest --watch"
   },
