@@ -1,5 +1,5 @@
 import { characters } from './characters';
-import { collapse, flipMultiple } from './mapper';
+import { collapse, flipMultiple } from './utilities';
 import { merge, forEach } from 'lodash';
 
 export const patterns = {
