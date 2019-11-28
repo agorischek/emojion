@@ -49,7 +49,7 @@ const processValue = (input: any) => {
 const processObject = (input: object, isRoot: boolean) => {
   const convertedProperties: string[] = [];
   forOwn(input, (value, key) => {
-    convertedProperties.push(processProperty({ key: key, value: value }));
+    convertedProperties.push(processProperty({ key, value }));
   });
   if (isRoot) {
     return convertedProperties;
