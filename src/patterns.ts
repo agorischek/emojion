@@ -1,6 +1,6 @@
 import { characters } from './characters';
 import { collapse, flipMultiple } from './utilities';
-import { merge, forEach } from 'lodash';
+import { forEach, merge } from 'lodash';
 
 export const patterns = {
   arrayClose: characters.document.arrayClose,
@@ -50,11 +50,11 @@ export const conversionTable: any = {
     keyUpperLetters,
     characters.keys.numerals
   ),
+  numbers: characters.values.numbers,
   strings: merge(
     {},
     characters.values.letters,
     valueUpperLetters,
     characters.values.numerals
   ),
-  numbers: characters.values.numbers,
 };
