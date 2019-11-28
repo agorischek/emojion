@@ -64,6 +64,22 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
+  test('Should parse a document with a multicharacter string key', () => {
+    const document = '🙌🤔🙃😭🐝✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"iur":"b"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with a multicharacter string and numeral key', () => {
+    const document = '🙌😵😿🦋✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"x6":"u"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
   test('Should parse a document with a multicharacter numeric value', () => {
     const document = '🙌😖🕑🕒🕔✋';
     const parsed = parse(document);

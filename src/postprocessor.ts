@@ -13,7 +13,7 @@ export const PAIR = (d: any) => {
   return d[0] + ':' + d[1];
 };
 export const WRAPSTRING = (d: any) => {
-  return '"' + d[0] + '"';
+  return '"' + d[0].join('') + '"';
 };
 export const CONVERT = (d: any) => {
   return lookUp(d[0]);
