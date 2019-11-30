@@ -175,4 +175,36 @@ describe('Parser', () => {
     validateJSON(parsed);
     validateGrammar(document);
   });
+
+  test('Should parse a document with a four nibble unicode value', () => {
+    const document = '🙌😭🗺🖋🖌📕📍✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"r":"ǧ"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with a five nibble unicode value', () => {
+    const document = '🙌😭🗺🖌📋🖊📓📏✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"r":"🏆"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with a four nibble unicode key and value', () => {
+    const document = '🙌🌎🍏🍎🍎🥭🗺🖋🖌📕📍✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"Ĝ":"ǧ"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with a five nibble unicode key and value', () => {
+    const document = '🙌🌎🍎🥝🍉🍓🥝🗺🖌📋🖊📓📏✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"🚏":"🏆"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
 });

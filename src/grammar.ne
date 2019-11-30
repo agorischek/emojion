@@ -51,7 +51,7 @@ valueStringSection ->
     valueStringUnicodeCharacter {% BUILDUNICODE %}
   | valueStringCharacter
 valueStringUnicodeCharacter -> %valueModifierUnicode valueUnicodeNibbles {% TAKESECOND %}
-valueUnicodeNibbles -> %valueUnicodeNibble %valueUnicodeNibble %valueUnicodeNibble %valueUnicodeNibble %valueUnicodeNibble {% CONVERTMULTIPLE %}
+valueUnicodeNibbles -> %valueUnicodeNibble:+ {% CONVERTMULTIPLE %}
 valueStringCharacter ->
     valueLowerCaseLetter
   | valueUpperCaseLetter

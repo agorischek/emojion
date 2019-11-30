@@ -52,7 +52,6 @@ export const BUILDUNICODE = (d: any) => {
     const codePoint = parseInt(Number('0x' + nibble), 10);
     const character = String.fromCodePoint(codePoint);
     return character;
-    console.log(character);
   } else {
     return null;
   }
