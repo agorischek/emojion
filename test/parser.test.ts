@@ -159,4 +159,12 @@ describe('Parser', () => {
     validateJSON(parsed);
     validateGrammar(document);
   });
+
+  test('Should parse a document with a unicode key', () => {
+    const document = '🙌🌎🍏🍊🍒🍉🐜✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"Φ":"a"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
 });

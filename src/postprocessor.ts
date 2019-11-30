@@ -43,3 +43,13 @@ export const COLLAPSEARRAY = (d: any) => {
 export const ASSEMBLEOBJECT = (d: any) => {
   return '{' + d[0].join(',') + '}';
 };
+export const CONVERTMULTIPLE = (d: any) => {
+  return d[0].map((x: any) => lookUp(x));
+};
+export const BUILDUNICODE = (d: any) => {
+  var character = '';
+  try {
+    character = JSON.parse(`["\\u` + d[0].join('') + `"]`)[0];
+  } catch {}
+  return character;
+};

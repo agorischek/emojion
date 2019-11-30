@@ -5,7 +5,7 @@
   import {
     EMPTYOBJECT, PAIR, WRAPSTRING, CONVERT,
     CONVERTUPPER, CONCAT, CONCATWRAPSTRING, COLLAPSEARRAY, TAKESECOND,
-    SELF, ASSEMBLEOBJECT
+    SELF, ASSEMBLEOBJECT, CONVERTMULTIPLE, BUILDUNICODE
     } from '../src/postprocessor'
 %}
 
@@ -22,13 +22,18 @@ properties -> property:+ {% ASSEMBLEOBJECT %}
 property -> key value {% PAIR %}
 property -> key object {% PAIR %}
 object -> %documentIndent properties %documentOutdent {% TAKESECOND %}
-key -> keyCharacter:+ {% WRAPSTRING %}
+key -> keySection:+ {% WRAPSTRING %}
+keySection ->
+    keyUnicodeCharacter {% BUILDUNICODE %}
+  | keyCharacter
+keyUnicodeCharacter -> %keyModifierUnicode keyUnicodeNibbles {% TAKESECOND %}
+keyUnicodeNibbles -> %keyUnicodeNibble:* {% CONVERTMULTIPLE %}
 keyCharacter ->
     keyLowerCaseLetter
   | keyUpperCaseLetter
   | keyNumeral
 keyLowerCaseLetter -> %keyLetter {% CONVERT %}
-keyUpperCaseLetter -> %keyModifier %keyLetter {% CONVERTUPPER %}
+keyUpperCaseLetter -> %keyModifierUpper %keyLetter {% CONVERTUPPER %}
 keyNumeral -> %keyNumeral {% CONVERT %}
 value ->
     array
@@ -45,6 +50,6 @@ valueStringCharacter ->
   | valueUpperCaseLetter
   | valueNumeral
 valueLowerCaseLetter -> %valueLetter {% CONVERT %}
-valueUpperCaseLetter -> %valueModifier %valueLetter {% CONVERTUPPER %}
+valueUpperCaseLetter -> %valueModifierUpper %valueLetter {% CONVERTUPPER %}
 valueNumeral -> %valueNumeral {% CONVERT %}
 number -> %valueNumber {% CONVERT %}
