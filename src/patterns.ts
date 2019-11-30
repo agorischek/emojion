@@ -67,4 +67,13 @@ export const conversionTable: any = {
     valueUpperLetters,
     characters.values.numerals
   ),
+  unicode: {
+    keys: characters.keys.unicode,
+    values: characters.values.unicode,
+  },
+};
+
+export const unicodeTable: any = {
+  keys: characters.keys.unicode,
+  values: characters.values.unicode,
 };

@@ -23,8 +23,17 @@ describe('Generator', () => {
 
   test('Should return a simple object', () => {
     const generated = generate('{"a":"a"}');
-
     expect(generated).toBe('🙌😠🐜✋');
+  });
+
+  test('Should return a key with unicode', () => {
+    const generated = generate('{"a🎱":"a"}');
+    expect(generated).toBe('🙌😠🌎🍎🥝🍊🍑🍎🐜✋');
+  });
+
+  test('Should return a value with unicode', () => {
+    const generated = generate('{"a":"a🏸"}');
+    expect(generated).toBe('🙌😠🐜🗺🖌📋🖊📋📌✋');
   });
 
   test('Should return an object with a numeric value', () => {
