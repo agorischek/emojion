@@ -1,5 +1,8 @@
 import { characters } from './characters';
-import { collapse, flipMultiple } from './utilities';
+import {
+  makeRegexpFromValuesInObject,
+  switchKeysAndValuesInMultipleObjectsThenMerge,
+} from './utilities';
 import { forEach, merge } from 'lodash';
 
 export const patterns = {
@@ -10,25 +13,31 @@ export const patterns = {
   documentIndent: characters.document.indent,
   documentOutdent: characters.document.outdent,
   documentStart: characters.document.start,
-  keyLetter: collapse(characters.keys.letters),
-  keyModifier: characters.keys.modifiers.upperCase,
-  keyNumeral: collapse(characters.keys.numerals),
-  valueBool: collapse(characters.values.booleans),
-  valueLetter: collapse(characters.values.letters),
-  valueModifier: characters.values.modifiers.upperCase,
+  keyLetter: makeRegexpFromValuesInObject(characters.keys.letters),
+  keyModifierUpper: characters.keys.modifiers.upperCase,
+  keyModifierUnicode: characters.keys.modifiers.unicode,
+  keyUnicodeNibble: makeRegexpFromValuesInObject(characters.keys.unicode),
+  keyNumeral: makeRegexpFromValuesInObject(characters.keys.numerals),
+  valueBool: makeRegexpFromValuesInObject(characters.values.booleans),
+  valueLetter: makeRegexpFromValuesInObject(characters.values.letters),
+  valueModifierUpper: characters.values.modifiers.upperCase,
+  valueModifierUnicode: characters.values.modifiers.unicode,
+  valueUnicodeNibble: makeRegexpFromValuesInObject(characters.keys.unicode),
   valueNull: characters.values.other.null,
-  valueNumber: collapse(characters.values.numbers),
-  valueNumeral: collapse(characters.values.numerals),
+  valueNumber: makeRegexpFromValuesInObject(characters.values.numbers),
+  valueNumeral: makeRegexpFromValuesInObject(characters.values.numerals),
 };
 
-export const lookupTable = flipMultiple([
+export const lookupTable = switchKeysAndValuesInMultipleObjectsThenMerge([
   characters.keys.letters,
   characters.keys.numerals,
+  characters.keys.unicode,
   characters.values.letters,
   characters.values.numerals,
   characters.values.numbers,
   characters.values.other,
   characters.values.booleans,
+  characters.values.unicode,
 ]);
 
 const keyUpperLetters: any = {};

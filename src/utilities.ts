@@ -1,36 +1,38 @@
 import { invert, merge } from 'lodash';
 
-function extractValues(dict: object) {
+function concatValuesFromObject(dict: object) {
   const values = Object.values(dict);
   const concatenation = values.reduce((acc, val) => acc.concat(val));
   return concatenation;
 }
 
-function makeRegexp(characters: string) {
+export const makeRegexp = (characters: string) => {
   const regexp = new RegExp(`[ ${characters}]`, 'u');
   return regexp;
-}
+};
 
-export const collapse = (dict: object) => {
-  const concatenation = extractValues(dict);
+export const makeRegexpFromValuesInObject = (dict: object) => {
+  const concatenation = concatValuesFromObject(dict);
   const regexp = makeRegexp(concatenation);
   return regexp;
 };
 
-export const collapseMultiple = (dicts: object[]) => {
-  const valuesArray = dicts.map(x => extractValues(x));
+export const makeRegexpFromValuesInMultipleObjects = (dicts: object[]) => {
+  const valuesArray = dicts.map(x => concatValuesFromObject(x));
   const concatenation = valuesArray.reduce((acc, val) => acc.concat(val));
   const regexp = makeRegexp(concatenation);
   return regexp;
 };
 
-export const flip = (dict: object) => {
+export const switchKeysAndValuesInObject = (dict: object) => {
   const flipped = invert(dict);
   return flipped;
 };
 
-export const flipMultiple = (dicts: object[]) => {
-  const flippedArray = dicts.map(x => flip(x));
+export const switchKeysAndValuesInMultipleObjectsThenMerge = (
+  dicts: object[]
+) => {
+  const flippedArray = dicts.map(x => switchKeysAndValuesInObject(x));
   const merged = flippedArray.reduce((acc, val) => merge(acc, val));
   return merged;
 };
