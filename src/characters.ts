@@ -38,7 +38,6 @@ export const characters = {
       z: '🤐',
     },
     modifiers: {
-      escape: '👟',
       upperCase: '👠',
       unicode: '🌎',
     },
@@ -107,7 +106,6 @@ export const characters = {
       z: '🦓',
     },
     modifiers: {
-      escape: '🥾',
       upperCase: '👡',
       unicode: '🗺',
     },
