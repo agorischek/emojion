@@ -24,6 +24,9 @@ export const CONVERTUPPER = (d: any) => {
 export const CONCAT = (d: any) => {
   return d[0].join('');
 };
+export const BUILDFLOAT = (d: any) => {
+  return d[0].join('') + d[1] + d[2].join('');
+};
 export const CONCATWRAPSTRING = (d: any) => {
   return '"' + d[0].join('') + '"';
 };
@@ -49,6 +52,7 @@ export const CONVERTMULTIPLE = (d: any) => {
 export const BUILDUNICODE = (d: any) => {
   const nibble = d[0].join('');
   if (nibble) {
+    //@ts-ignore
     const codePoint = parseInt(Number('0x' + nibble), 10);
     const character = String.fromCodePoint(codePoint);
     return character;

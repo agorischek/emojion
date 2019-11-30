@@ -20,6 +20,7 @@ export const patterns = {
   keyNumeral: makeRegexpFromValuesInObject(characters.keys.numerals),
   valueBool: makeRegexpFromValuesInObject(characters.values.booleans),
   valueLetter: makeRegexpFromValuesInObject(characters.values.letters),
+  valueDecimal: characters.values.numbers['.'],
   valueModifierUpper: characters.values.modifiers.upperCase,
   valueModifierUnicode: characters.values.modifiers.unicode,
   valueUnicodeNibble: makeRegexpFromValuesInObject(characters.values.unicode),

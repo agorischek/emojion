@@ -29,13 +29,8 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
-  test.skip('Should parse a document with a floating point value', () => {
+  test('Should parse a document with a floating point value', () => {
     const document = '🙌😭🕓🕖⛳️🕗🕐✋';
-    // const lexed = lex(document);
-    // console.log(lexed);
-    // console.log(lexed[4].toString());
-    //
-    // console.log(lexed[5].toString());
     const parsed = parse(document);
     expect(parsed).toBe('{"r":47.81}');
     validateJSON(parsed);

@@ -3,9 +3,9 @@
 @{%
   import { lexer } from '../src/lexer'
   import {
-    EMPTYOBJECT, PAIR, WRAPSTRING, CONVERT,
-    CONVERTUPPER, CONCAT, CONCATWRAPSTRING, COLLAPSEARRAY, TAKESECOND,
-    SELF, ASSEMBLEOBJECT, CONVERTMULTIPLE, BUILDUNICODE
+    ASSEMBLEOBJECT, BUILDFLOAT, BUILDUNICODE, COLLAPSEARRAY, CONCAT,
+    CONCATWRAPSTRING, CONVERT, CONVERTMULTIPLE, CONVERTUPPER, EMPTYOBJECT,
+    PAIR, SELF, TAKESECOND, WRAPSTRING
     } from '../src/postprocessor'
 %}
 
@@ -40,9 +40,13 @@ keyNumeral -> %keyNumeral {% CONVERT %}
 value ->
     array
   | string
-  | number:+ {% CONCAT %}
+  | integer {% SELF %}
+  | float {% SELF %}
   | %valueBool {% CONVERT %}
   | %valueNull {% CONVERT %}
+integer -> number:+ {% CONCAT %}
+float -> number:+ decimalPoint number:+ {% BUILDFLOAT %}
+decimalPoint -> %valueDecimal {% CONVERT %}
 array -> %arrayOpen initialArrayItem additionalArrayItem:* %arrayClose {% COLLAPSEARRAY %}
 initialArrayItem -> value
 additionalArrayItem -> %arrayDelimit value {% TAKESECOND %}
