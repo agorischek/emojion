@@ -202,4 +202,20 @@ describe('Parser', () => {
     validateJSON(parsed);
     validateGrammar(document);
   });
+
+  test('Should parse a document with a mixed letter and unicode key', () => {
+    const document = '🙌😂🌎🍏🍎🍎🥭🤩🐜✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"jĜy":"a"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with a mixed letter and unicode value', () => {
+    const document = '🙌😭🐖🗺🖋🖌📕📍🦋✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"r":"iǧu"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
 });
