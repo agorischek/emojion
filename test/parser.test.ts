@@ -29,18 +29,18 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
-  // test('Should parse a document with a floating point value', () => {
-  //   const document = '🙌😭🕓🕖⛳️🕗🕐✋';
-  //   const lexed = lex(document);
-  //   console.log(lexed);
-  //   console.log(lexed[4].toString());
-  //
-  //   console.log(lexed[5].toString());
-  //   const parsed = parse(document);
-  //   expect(parsed).toBe('{"r":47.81}');
-  //   validateJSON(parsed);
-  //   validateGrammar(document);
-  // });
+  test.skip('Should parse a document with a floating point value', () => {
+    const document = '🙌😭🕓🕖⛳️🕗🕐✋';
+    // const lexed = lex(document);
+    // console.log(lexed);
+    // console.log(lexed[4].toString());
+    //
+    // console.log(lexed[5].toString());
+    const parsed = parse(document);
+    expect(parsed).toBe('{"r":47.81}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
 
   test('Should parse a document that is only a boolean', () => {
     const document = '🙌💚✋';
@@ -160,10 +160,18 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
-  test('Should parse a document with a unicode key', () => {
-    const document = '🙌🌎🍏🍊🍒🍉🐜✋';
+  test('Should parse a document with a four nibble unicode key', () => {
+    const document = '🙌🌎🍏🍎🍎🥭🐜✋';
     const parsed = parse(document);
-    expect(parsed).toBe('{"Φ":"a"}');
+    expect(parsed).toBe('{"Ĝ":"a"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with a five nibble unicode key', () => {
+    const document = '🙌🌎🍎🥝🍉🍓🥝🐜✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"🚏":"a"}');
     validateJSON(parsed);
     validateGrammar(document);
   });

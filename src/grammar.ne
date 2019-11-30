@@ -22,6 +22,7 @@ properties -> property:+ {% ASSEMBLEOBJECT %}
 property -> key value {% PAIR %}
 property -> key object {% PAIR %}
 object -> %documentIndent properties %documentOutdent {% TAKESECOND %}
+
 key -> keySection:+ {% WRAPSTRING %}
 keySection ->
     keyUnicodeCharacter {% BUILDUNICODE %}
@@ -35,6 +36,7 @@ keyCharacter ->
 keyLowerCaseLetter -> %keyLetter {% CONVERT %}
 keyUpperCaseLetter -> %keyModifierUpper %keyLetter {% CONVERTUPPER %}
 keyNumeral -> %keyNumeral {% CONVERT %}
+
 value ->
     array
   | string
@@ -44,7 +46,12 @@ value ->
 array -> %arrayOpen initialArrayItem additionalArrayItem:* %arrayClose {% COLLAPSEARRAY %}
 initialArrayItem -> value
 additionalArrayItem -> %arrayDelimit value {% TAKESECOND %}
-string -> valueStringCharacter:+ {% CONCATWRAPSTRING %}
+string -> valueStringSection:+ {% CONCATWRAPSTRING %}
+valueStringSection ->
+    valueStringUnicodeCharacter {% BUILDUNICODE %}
+  | valueStringCharacter
+valueStringUnicodeCharacter -> %valueModifierUnicode valueUnicodeNibbles {% TAKESECOND %}
+valueUnicodeNibbles -> %valueUnicodeNibble %valueUnicodeNibble %valueUnicodeNibble %valueUnicodeNibble %valueUnicodeNibble {% CONVERTMULTIPLE %}
 valueStringCharacter ->
     valueLowerCaseLetter
   | valueUpperCaseLetter

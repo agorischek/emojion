@@ -22,7 +22,7 @@ export const patterns = {
   valueLetter: makeRegexpFromValuesInObject(characters.values.letters),
   valueModifierUpper: characters.values.modifiers.upperCase,
   valueModifierUnicode: characters.values.modifiers.unicode,
-  valueUnicodeNibble: makeRegexpFromValuesInObject(characters.keys.unicode),
+  valueUnicodeNibble: makeRegexpFromValuesInObject(characters.values.unicode),
   valueNull: characters.values.other.null,
   valueNumber: makeRegexpFromValuesInObject(characters.values.numbers),
   valueNumeral: makeRegexpFromValuesInObject(characters.values.numerals),

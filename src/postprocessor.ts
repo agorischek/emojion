@@ -47,9 +47,13 @@ export const CONVERTMULTIPLE = (d: any) => {
   return d[0].map((x: any) => lookUp(x));
 };
 export const BUILDUNICODE = (d: any) => {
-  var character = '';
-  try {
-    character = JSON.parse(`["\\u` + d[0].join('') + `"]`)[0];
-  } catch {}
-  return character;
+  const nibble = d[0].join('');
+  if (nibble) {
+    const codePoint = parseInt(Number('0x' + nibble), 10);
+    const character = String.fromCodePoint(codePoint);
+    return character;
+    console.log(character);
+  } else {
+    return null;
+  }
 };
