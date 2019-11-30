@@ -1,4 +1,5 @@
 import { lookUp } from './mapper';
+import { charFromCodePoint } from './utilities';
 
 export const EMPTYOBJECT = () => {
   return '{}';
@@ -50,12 +51,8 @@ export const CONVERTMULTIPLE = (d: any) => {
   return d[0].map((x: any) => lookUp(x));
 };
 export const BUILDUNICODE = (d: any) => {
-  const nibble = d[0].join('');
-  if (nibble) {
-    //@ts-ignore
-    const codePoint = parseInt(Number('0x' + nibble), 10);
-    const character = String.fromCodePoint(codePoint);
-    return character;
+  if (d[0].length > 0) {
+    return charFromCodePoint(d[0].join(''));
   } else {
     return null;
   }

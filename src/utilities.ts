@@ -36,3 +36,12 @@ export const switchKeysAndValuesInMultipleObjectsThenMerge = (
   const merged = flippedArray.reduce((acc, val) => merge(acc, val));
   return merged;
 };
+
+export const charFromCodePoint = (hexNibblesAsString: string) => {
+  const hexNumberAsString: string = Number(
+    '0x' + hexNibblesAsString
+  ).toString();
+  const codePoint: number = parseInt(hexNumberAsString, 10);
+  const character: string = String.fromCodePoint(codePoint);
+  return character;
+};
