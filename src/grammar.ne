@@ -4,21 +4,20 @@
   import { lexer } from '../src/lexer'
   import {
     ASSEMBLEOBJECT, BUILDFLOAT, BUILDUNICODE, COLLAPSEARRAY, CONCAT,
-    CONCATWRAPSTRING, CONVERT, CONVERTMULTIPLE, CONVERTUPPER, EMPTYOBJECT,
-    PAIR, SELF, TAKESECOND, WRAPSTRING
+    CONCATWRAPSTRING, CONVERT, CONVERTMULTIPLE, CONVERTUPPER, PAIR, SELF,
+    TAKESECOND, WRAPSTRING
     } from '../src/postprocessor'
 %}
 
 @lexer lexer
 
-document -> %documentStart %documentEnd {% EMPTYOBJECT %}
 document -> %documentStart content %documentEnd {% TAKESECOND %}
 content ->
     properties {% SELF %}
   | array {% SELF %}
   | %valueBool {% CONVERT %}
   | %valueNull {% CONVERT %}
-properties -> property:+ {% ASSEMBLEOBJECT %}
+properties -> property:* {% ASSEMBLEOBJECT %}
 property -> key value {% PAIR %}
 property -> key object {% PAIR %}
 object -> %documentIndent properties %documentOutdent {% TAKESECOND %}
