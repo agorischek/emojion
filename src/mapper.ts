@@ -8,22 +8,36 @@ export const convert = {
     if (conversionTable.keys[character]) {
       return conversionTable.keys[character];
     } else {
-      const codePoint = character.codePointAt(0).toString(16);
-      const encoded =
-        characters.keys.modifiers.unicode +
-        [...codePoint].map(x => conversionTable.unicode.keys[x]).join('');
-      return encoded;
+      const decCodePoint = character.codePointAt(0);
+      if (decCodePoint) {
+        const hexCodePointString = decCodePoint.toString(16);
+        const encoded =
+          characters.keys.modifiers.unicode +
+          [...hexCodePointString]
+            .map(x => conversionTable.unicode.keys[x])
+            .join('');
+        return encoded;
+      } else {
+        return null;
+      }
     }
   },
   value: (character: string) => {
     if (conversionTable.strings[character]) {
       return conversionTable.strings[character];
     } else {
-      const codePoint = character.codePointAt(0).toString(16);
-      const encoded =
-        characters.values.modifiers.unicode +
-        [...codePoint].map(x => conversionTable.unicode.values[x]).join('');
-      return encoded;
+      const decCodePoint = character.codePointAt(0);
+      if (decCodePoint) {
+        const hexCodePointString = decCodePoint.toString(16);
+        const encoded =
+          characters.values.modifiers.unicode +
+          [...hexCodePointString]
+            .map(x => conversionTable.unicode.values[x])
+            .join('');
+        return encoded;
+      } else {
+        return null;
+      }
     }
   },
   number: (character: string) => {
