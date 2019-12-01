@@ -52,7 +52,7 @@ const processObject = (input: object, isRoot: boolean) => {
     convertedProperties.push(processProperty({ key, value }));
   });
   if (isRoot) {
-    return convertedProperties;
+    return convertedProperties.join('');
   } else {
     return (
       characters.document.indent +

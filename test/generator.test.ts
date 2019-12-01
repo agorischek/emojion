@@ -72,6 +72,11 @@ describe('Generator', () => {
   });
 
   test('Should encode capital letters', () => {
+    const generated = generate('{"g":4,"f":1}');
+    expect(generated).toBe('🙌🤪🕓☹️🕐✋');
+  });
+
+  test('Should return an object with multiple properties', () => {
     const generated = generate('{"L":"X"}');
     expect(generated).toBe('🙌👠🥰👡🐂✋');
   });
