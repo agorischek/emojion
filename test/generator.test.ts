@@ -46,6 +46,11 @@ describe('Generator', () => {
     expect(generated).toBe('🙌😠🕐⛳️🕐✋');
   });
 
+  test('Should return a subobject with multiple properties', () => {
+    const generated = generate('{"a": {"b": true, "c": false}}');
+    expect(generated).toBe('🙌😠👉🥺💚😖💔👈✋');
+  });
+
   test('Should return an empty array', () => {
     const generated = generate('[]');
     expect(generated).toBe('🙌🤜🤛✋');

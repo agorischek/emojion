@@ -56,7 +56,7 @@ const processObject = (input: object, isRoot: boolean) => {
   } else {
     return (
       characters.document.indent +
-      convertedProperties +
+      convertedProperties.join('') +
       characters.document.outdent
     );
   }
