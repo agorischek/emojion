@@ -20,7 +20,7 @@
   "scripts": {
     "clean": "rimraf lib && rimraf coverage",
     "format": "prettier --write \"{src,__tests__}/**/*.ts\" --single-quote --trailing-comma es5",
-    "lint": "tslint --force --format verbose \"src/**/*.ts\"",
+    "lint": "eslint src/**/*.ts",
     "prepublishOnly": "npm run build",
     "prebuild": "npm run clean && npm run format && npm run lint && echo Using TypeScript && tsc --version",
     "build": "npm run build:grammar && npm run build:scripts",
@@ -41,6 +41,7 @@
     "@types/moo": "^0.5.0",
     "@types/nearley": "^2.11.0",
     "@types/node": "^12.12.14",
+    "eslint": "^6.7.2",
     "lodash": "^4.17.15",
     "moo": "^0.5.1",
     "nearley": "^2.19.0",
@@ -57,7 +58,6 @@
     "ts-jest": "^24.2.0",
     "ts-node": "^8.5.2",
     "tslib": "^1.10.0",
-    "tslint": "^5.20.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.7.2"
   },
