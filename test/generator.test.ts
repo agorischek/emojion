@@ -36,6 +36,11 @@ describe('Generator', () => {
     expect(generated).toBe('🙌🥰🧵✋');
   });
 
+  test('Should return both an empty key and value string', () => {
+    const generated = generate('{"":""}');
+    expect(generated).toBe('🙌🗝🧵✋');
+  });
+
   test('Should return a key with unicode', () => {
     const generated = generate('{"a🎱":"a"}');
     expect(generated).toBe('🙌😠🌎🍎🥝🍊🍑🍎🐜✋');
