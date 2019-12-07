@@ -68,7 +68,10 @@ interface IProperty {
 }
 
 const processProperty = (input: IProperty) => {
-  const convertedKey = [...input.key].map(i => convert.key(i)).join('');
+  const convertedKey =
+    input.key === ''
+      ? characters.keys.other.empty
+      : [...input.key].map(i => convert.key(i)).join('');
   const convertedValue = processValue(input.value);
   const converted = convertedKey + convertedValue;
   return converted;

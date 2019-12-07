@@ -26,6 +26,11 @@ describe('Generator', () => {
     expect(generated).toBe('🙌😠🐜✋');
   });
 
+  test('Should return an empty key', () => {
+    const generated = generate('{"":1}');
+    expect(generated).toBe('🙌🗝🕐✋');
+  });
+
   test('Should return an empty value string', () => {
     const generated = generate('{"l":""}');
     expect(generated).toBe('🙌🥰🧵✋');

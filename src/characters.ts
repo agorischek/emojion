@@ -53,6 +53,9 @@ export const characters = {
       8: '😼',
       9: '🙀',
     },
+    other: {
+      empty: '🗝',
+    },
     unicode: {
       0: '🍏',
       1: '🍎',

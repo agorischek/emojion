@@ -23,6 +23,7 @@ property -> key object {% PAIR %}
 object -> %documentIndent properties %documentOutdent {% TAKESECOND %}
 
 key -> keySection:+ {% WRAPSTRING %}
+key -> %keyEmptyString {% EMPTYSTRING %}
 keySection ->
     keyUnicodeCharacter {% BUILDUNICODE %}
   | keyCharacter
@@ -50,7 +51,7 @@ array -> %arrayOpen initialArrayItem additionalArrayItem:* %arrayClose {% COLLAP
 initialArrayItem -> value
 additionalArrayItem -> %arrayDelimit value {% TAKESECOND %}
 string -> valueStringSection:+ {% CONCATWRAPSTRING %}
-string -> %emptyString {% EMPTYSTRING %}
+string -> %valueEmptyString {% EMPTYSTRING %}
 valueStringSection ->
     valueStringUnicodeCharacter {% BUILDUNICODE %}
   | valueStringCharacter
