@@ -258,6 +258,14 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
+  test('Should parse a document with newlines and whitespace', () => {
+    const document = '🙌🌎 🍎🥝\n🍉🍓🥝🗺🖌 📋🖊📓📏✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"🚏":"🏆"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
   test('Should parse a document with a mixed letter and unicode key', () => {
     const document = '🙌😂🌎🍏🍎🍎🥭🤩🐜✋';
     const parsed = parse(document);
