@@ -1,5 +1,5 @@
 {
-  "name": "emojion",
+  "name": "emj",
   "version": "0.0.1",
   "description": "Emoji Object Notation",
   "license": "MIT",
@@ -15,13 +15,11 @@
   "files": [
     "lib"
   ],
-  "main": "lib/src/index",
-  "types": "lib/src/index",
+  "main": "lib/src/index.js",
   "scripts": {
     "clean": "rimraf lib && rimraf coverage",
     "format": "prettier --write \"{src,test}/**/*.ts\" && prettier --write README.md",
     "lint": "eslint src/**/*.ts",
-    "prepublishOnly": "npm run build",
     "prebuild": "npm run clean && npm run format && npm run lint && echo Using TypeScript && tsc --version",
     "build": "npm run build:grammar && npm run build:lib && npm run build:bundle",
     "build:grammar": "mkdir -p gen && nearleyc src/grammar.ne -o gen/grammar.ts && replace-in-file \"Lexer: lexer,\" \"// @ts-ignore\nLexer: lexer,\" gen/grammar.ts",
