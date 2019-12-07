@@ -21,14 +21,16 @@ _Emoji Object Notation_
 
 ## Use
 
-A command is provided to `parse` Emojion into a JavaScript object, as well as to
-`generate` it from a JavaScript object.
+Call `parse()` to turn Emojion into a JavaScript object, and call `generate()`
+to go the other way.
 
 ```ts
-const object = parse('🙌😶😠🤑😳👡🐘🐁🦉🦒🐖🦉🦏✋');
+import { generate, parse } from 'emojion';
+
+const obj = parse('🙌😶😠🤑😳👡🐘🐁🦉🦒🐖🦉🦏✋');
 // { name: "Emojion" }
 
-const emojion = generate({ created: 2019 });
+const emj = generate({ created: 2019 });
 // 🙌😖😭😳😠😛😳🤤🕑🕛🕐🕘✋
 ```
 
