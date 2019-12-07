@@ -25,12 +25,12 @@ Call `parse()` to turn Emojion into a JavaScript object, and call `generate()`
 to go the other way.
 
 ```ts
-import { generate, parse } from 'emojion';
+import { generate, parse } from 'emj';
 
-const obj = parse('🙌😶😠🤑😳👡🐘🐁🦉🦒🐖🦉🦏✋');
+const object = parse('🙌😶😠🤑😳👡🐘🐁🦉🦒🐖🦉🦏✋');
 // { name: "Emojion" }
 
-const emj = generate({ created: 2019 });
+const emojion = generate({ created: 2019 });
 // 🙌😖😭😳😠😛😳🤤🕑🕛🕐🕘✋
 ```
 
