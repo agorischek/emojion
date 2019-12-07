@@ -3,14 +3,14 @@
   "version": "0.0.1",
   "description": "Emoji Object Notation",
   "license": "MIT",
-  "repository": "",
+  "repository": "https://github.com/agorischek/emojion",
   "author": {
     "name": "Alex Gorischek",
     "email": "alex.gorischek@gmail.com",
     "url": ""
   },
   "keywords": [
-    ""
+    "object notation"
   ],
   "files": [
     "lib"
