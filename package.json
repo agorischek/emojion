@@ -15,8 +15,8 @@
   "files": [
     "lib"
   ],
-  "main": "lib/bundle",
-  "types": "lib/index",
+  "main": "lib/src/index",
+  "types": "lib/src/index",
   "scripts": {
     "clean": "rimraf lib && rimraf coverage",
     "format": "prettier --write \"{src,test}/**/*.ts\" && prettier --write README.md",
