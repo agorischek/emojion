@@ -38,8 +38,8 @@ export const characters = {
       z: '🤐',
     },
     modifiers: {
-      upperCase: '👠',
       unicode: '🌎',
+      upperCase: '👠',
     },
     numerals: {
       0: '🐱',
@@ -106,8 +106,8 @@ export const characters = {
       z: '🦓',
     },
     modifiers: {
-      upperCase: '👡',
       unicode: '🗺',
+      upperCase: '👡',
     },
     numbers: {
       0: '🕛',

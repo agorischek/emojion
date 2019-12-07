@@ -1,7 +1,7 @@
-import { typeOf } from './typer';
 import { characters } from './characters';
-import { convert } from './mapper';
 import { forOwn } from 'lodash';
+import { convert } from './mapper';
+import { typeOf } from './typer';
 
 export const generate = (input: any) => {
   const parsed = JSON.parse(input);
@@ -62,12 +62,12 @@ const processObject = (input: object, isRoot: boolean) => {
   }
 };
 
-interface Property {
+interface IProperty {
   key: string;
   value: string;
 }
 
-const processProperty = (input: Property) => {
+const processProperty = (input: IProperty) => {
   const convertedKey = [...input.key].map(i => convert.key(i)).join('');
   const convertedValue = processValue(input.value);
   const converted = convertedKey + convertedValue;

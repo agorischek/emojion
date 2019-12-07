@@ -1,5 +1,5 @@
-import { lookupTable, conversionTable } from './patterns';
 import { characters } from './characters';
+import { lookupTable, conversionTable } from './patterns';
 
 export const lookUp = (character: string) => lookupTable[character];
 
