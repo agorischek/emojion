@@ -3,9 +3,20 @@
 @{%
   import { lexer } from '../src/lexer'
   import {
-    ASSEMBLEOBJECT, BUILDFLOAT, BUILDUNICODE, COLLAPSEARRAY, CONCAT,
-    CONCATWRAPSTRING, CONVERT, CONVERTMULTIPLE, CONVERTUPPER, EMPTYSTRING, PAIR,
-    SELF, TAKESECOND, WRAPSTRING
+    ASSEMBLEOBJECT,
+    BUILDFLOAT,
+    BUILDINT,
+    BUILDUNICODE,
+    COLLAPSEARRAY,
+    CONCATWRAPSTRING,
+    CONVERT,
+    CONVERTMULTIPLE,
+    CONVERTUPPER,
+    EMPTYSTRING,
+    PAIR,
+    SELF,
+    TAKESECOND,
+    WRAPSTRING
     } from '../src/postprocessor'
 %}
 
@@ -19,7 +30,6 @@ content ->
   | %valueNull {% CONVERT %}
 properties -> property:* {% ASSEMBLEOBJECT %}
 property -> key value {% PAIR %}
-property -> key object {% PAIR %}
 object -> %documentIndent properties %documentOutdent {% TAKESECOND %}
 
 key -> keySection:+ {% WRAPSTRING %}
@@ -38,14 +48,15 @@ keyUpperCaseLetter -> %keyModifierUpper %keyLetter {% CONVERTUPPER %}
 keyNumeral -> %keyNumeral {% CONVERT %}
 
 value ->
-    array
+    object
+  | array
   | string
   | integer {% SELF %}
   | float {% SELF %}
   | %valueBool {% CONVERT %}
   | %valueNull {% CONVERT %}
-integer -> number:+ {% CONCAT %}
-float -> number:+ decimalPoint number:+ {% BUILDFLOAT %}
+integer -> %valueModifierNegative:? number:+ {% BUILDINT %}
+float -> %valueModifierNegative:? number:+ decimalPoint number:+ {% BUILDFLOAT %}
 decimalPoint -> %valueDecimal {% CONVERT %}
 array -> %arrayOpen initialArrayItem additionalArrayItem:* %arrayClose {% COLLAPSEARRAY %}
 initialArrayItem -> value

@@ -111,6 +111,7 @@ export const characters = {
     modifiers: {
       unicode: '🗺',
       upperCase: '👡',
+      negative: '⏰',
     },
     numbers: {
       0: '🕛',

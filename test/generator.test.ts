@@ -51,9 +51,19 @@ describe('Generator', () => {
     expect(generated).toBe('🙌😠🕐✋');
   });
 
+  test('Should return an object with a negative numeric value', () => {
+    const generated = generate('{"a":-1}');
+    expect(generated).toBe('🙌😠⏰🕐✋');
+  });
+
   test('Should return an object with a floating point numeric value', () => {
     const generated = generate('{"a":1.1}');
     expect(generated).toBe('🙌😠🕐⛳️🕐✋');
+  });
+
+  test('Should return an object with a negative floating point numeric value', () => {
+    const generated = generate('{"a":-1.1}');
+    expect(generated).toBe('🙌😠⏰🕐⛳️🕐✋');
   });
 
   test('Should return a subobject with multiple properties', () => {

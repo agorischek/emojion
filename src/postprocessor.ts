@@ -28,8 +28,16 @@ export const CONVERTUPPER = (d: any) => {
 export const CONCAT = (d: any) => {
   return d[0].join('');
 };
+export const CONCATSECOND = (d: any) => {
+  return d[1].join('');
+};
+export const BUILDINT = (d: any) => {
+  const absolute = d[1].join('');
+  return d[0] ? '-' + absolute : absolute;
+};
 export const BUILDFLOAT = (d: any) => {
-  return d[0].join('') + d[1] + d[2].join('');
+  const absolute = d[1].join('') + d[2] + d[3].join('');
+  return d[0] ? '-' + absolute : absolute;
 };
 export const CONCATWRAPSTRING = (d: any) => {
   return '"' + d[0].join('') + '"';
@@ -54,9 +62,5 @@ export const CONVERTMULTIPLE = (d: any) => {
   return d[0].map((x: any) => lookUp(x));
 };
 export const BUILDUNICODE = (d: any) => {
-  if (d[0].length > 0) {
-    return charFromCodePoint(d[0].join(''));
-  } else {
-    return null;
-  }
+  return d[0].length > 0 ? charFromCodePoint(d[0].join('')) : null;
 };

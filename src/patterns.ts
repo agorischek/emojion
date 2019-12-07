@@ -24,6 +24,7 @@ export const patterns = {
   valueDecimal: characters.values.numbers['.'],
   valueEmptyString: characters.values.other.emptyString,
   valueModifierUpper: characters.values.modifiers.upperCase,
+  valueModifierNegative: characters.values.modifiers.negative,
   valueModifierUnicode: characters.values.modifiers.unicode,
   valueUnicodeNibble: makeRegexpFromValuesInObject(characters.values.unicode),
   valueNull: characters.values.other.null,
@@ -62,7 +63,9 @@ export const conversionTable: any = {
     keyUpperLetters,
     characters.keys.numerals
   ),
-  numbers: characters.values.numbers,
+  numbers: merge({}, characters.values.numbers, {
+    '-': characters.values.modifiers.negative,
+  }),
   strings: merge(
     {},
     characters.values.letters,

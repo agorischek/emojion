@@ -29,10 +29,26 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
+  test('Should parse a document with a negatie integer value', () => {
+    const document = '🙌🤤⏰🕑✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"d":-2}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
   test('Should parse a document with a floating point value', () => {
     const document = '🙌😭🕓🕖⛳️🕗🕐✋';
     const parsed = parse(document);
     expect(parsed).toBe('{"r":47.81}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with a negative floating point value', () => {
+    const document = '🙌😭⏰🕓🕖⛳️🕗🕐✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"r":-47.81}');
     validateJSON(parsed);
     validateGrammar(document);
   });
@@ -48,6 +64,13 @@ describe('Parser', () => {
     const document = '🙌🤜🐜🤝🐢🤝🐌🤛✋';
     const parsed = parse(document);
     expect(parsed).toBe('["a","t","s"]');
+    validateGrammar(document);
+  });
+
+  test('Should parse a document with an array of objects', () => {
+    const document = '🙌🤜👉🥰🐜👈🤝👉🤐🐢👈🤛✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('[{"l":"a"},{"z":"t"}]');
     validateGrammar(document);
   });
 
