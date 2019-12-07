@@ -17,7 +17,7 @@ export const WRAPSTRING = (d: any) => {
   return '"' + d[0].join('') + '"';
 };
 export const EMPTYSTRING = () => {
-  return '\"\"';
+  return '\"\"'; // eslint-disable-line no-useless-escape
 };
 export const CONVERT = (d: any) => {
   return lookUp(d[0]);
