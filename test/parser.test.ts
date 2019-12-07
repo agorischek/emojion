@@ -98,6 +98,14 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
+  test('Should parse a document with value containing numerals', () => {
+    const document = '🙌😵🌵🌻✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"x":"30"}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
   test('Should parse a document with a multicharacter numeric value', () => {
     const document = '🙌😖🕑🕒🕔✋';
     const parsed = parse(document);
