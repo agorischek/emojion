@@ -9,7 +9,7 @@ const globals = {
 export default {
   input: './src/index.ts',
   output: {
-    file: 'lib/bundle.js',
+    file: 'dist/bundle.js',
     format: 'cjs',
     globals: globals,
   },
