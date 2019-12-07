@@ -1,3 +1,2 @@
-export * from './lexer';
-export * from './parser';
-export * from './generator';
+export { parse } from './parser';
+export { generate } from './generator';

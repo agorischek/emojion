@@ -1,4 +1,4 @@
-import { lex } from '../src/index';
+import { lex } from '../src/lexer';
 
 describe('Lexer', () => {
   test('Should lex an empty document', () => {
