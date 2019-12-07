@@ -26,7 +26,6 @@ describe('Library', () => {
     const json = readJson('./test/docs/3.json');
     const emojion = generate(json);
     const parsed = parse(emojion);
-    fs.writeFileSync('out.sdlfjk', emojion);
     expect(parsed).toEqual(json);
   });
 
