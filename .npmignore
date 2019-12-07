@@ -12,5 +12,15 @@ lib_test
 # npmignore
 
 src/
+gen/
+test/
 __tests__/
 .vscode/
+
+.editorconfig
+.eslintrc.json
+.prettierrc
+.travis.yml
+rollup.config.js
+tsconfig.js
+wallaby.js
