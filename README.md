@@ -45,7 +45,7 @@ Keys are encoded with face emoji, such as `😠`, `🥺`, `😖`, `😺`, `😸`
 (`a`, `b`, `c`, `1`, `2`, `3` ). Capital letters are prefixed with `👠`. `🗝`
 represents an empty key.
 
-Strings are encoded with animals and plans, such as `🐜`, `🐝`, `🐄`, `🌹`,
+Strings are encoded with animals and plants, such as `🐜`, `🐝`, `🐄`, `🌹`,
 `🌱`, and `🌵` (`a`, `b`, `c`, `1`, `2`, `3` ). Capital letters are prefixed
 with `👡`. `🧵` represents an empty string.
 
@@ -56,7 +56,7 @@ with `⏰` (because alarms are annoying).
 `💚` is `true`, `💔` is `false`, and `🕳` is `null`.
 
 In keys, Unicode characters can be encoded using `🌎` followed by fruit, such as
-`🌎🍏🍊🍈🍓` for `U+0398`(which is `Θ`). In values, Unicode characters are
+`🌎🍏🍊🍈🍓` for `U+0398` (which is `Θ`). In values, Unicode characters are
 encoded using `🗺` followed by office supplies, such as `🗺🖋🖊🧷🔎` for `U+0394`
 (which is `Δ`).
 
@@ -87,3 +87,9 @@ documents), thus exploring their ability to stand on their own.
 ### When should I use this?
 
 When your coworker tells you YAML is "too hard to read".
+
+## Tech
+
+Emojion is built with the excellent
+[Moo lexer](https://www.npmjs.com/package/moo) and
+[Nearley parser](https://nearley.js.org) engines.
