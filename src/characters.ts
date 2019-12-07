@@ -136,6 +136,7 @@ export const characters = {
     },
     other: {
       null: '🕳',
+      emptyString: '🧵',
     },
     unicode: {
       0: '🖋',

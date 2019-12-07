@@ -147,6 +147,14 @@ describe('Parser', () => {
     validateGrammar(document);
   });
 
+  test('Should parse a document with an empty string value', () => {
+    const document = '🙌🤑🧵✋';
+    const parsed = parse(document);
+    expect(parsed).toBe('{"m":""}');
+    validateJSON(parsed);
+    validateGrammar(document);
+  });
+
   test('Should parse a document with two identical subobjects', () => {
     const document = '🙌🤑👉🤩🕔👈🤑👉🤩🕔👈✋';
     const parsed = parse(document);

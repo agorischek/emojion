@@ -16,6 +16,9 @@ export const PAIR = (d: any) => {
 export const WRAPSTRING = (d: any) => {
   return '"' + d[0].join('') + '"';
 };
+export const EMPTYSTRING = () => {
+  return '\"\"';
+};
 export const CONVERT = (d: any) => {
   return lookUp(d[0]);
 };

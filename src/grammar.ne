@@ -4,8 +4,8 @@
   import { lexer } from '../src/lexer'
   import {
     ASSEMBLEOBJECT, BUILDFLOAT, BUILDUNICODE, COLLAPSEARRAY, CONCAT,
-    CONCATWRAPSTRING, CONVERT, CONVERTMULTIPLE, CONVERTUPPER, PAIR, SELF,
-    TAKESECOND, WRAPSTRING
+    CONCATWRAPSTRING, CONVERT, CONVERTMULTIPLE, CONVERTUPPER, EMPTYSTRING, PAIR,
+    SELF, TAKESECOND, WRAPSTRING
     } from '../src/postprocessor'
 %}
 
@@ -50,6 +50,7 @@ array -> %arrayOpen initialArrayItem additionalArrayItem:* %arrayClose {% COLLAP
 initialArrayItem -> value
 additionalArrayItem -> %arrayDelimit value {% TAKESECOND %}
 string -> valueStringSection:+ {% CONCATWRAPSTRING %}
+string -> %emptyString {% EMPTYSTRING %}
 valueStringSection ->
     valueStringUnicodeCharacter {% BUILDUNICODE %}
   | valueStringCharacter

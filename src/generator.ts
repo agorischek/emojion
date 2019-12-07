@@ -84,8 +84,12 @@ const processArray = (input: []) => {
 };
 
 const processString = (input: string) => {
-  const convertedString = [...input].map(x => convert.value(x)).join('');
-  return convertedString;
+  if (input === '') {
+    return characters.values.other.emptyString;
+  } else {
+    const convertedString = [...input].map(x => convert.value(x)).join('');
+    return convertedString;
+  }
 };
 
 const processBoolean = (input: boolean) => {

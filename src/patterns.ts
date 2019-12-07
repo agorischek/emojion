@@ -13,6 +13,7 @@ export const patterns = {
   documentIndent: characters.document.indent,
   documentOutdent: characters.document.outdent,
   documentStart: characters.document.start,
+  emptyString: characters.values.other.emptyString,
   keyLetter: makeRegexpFromValuesInObject(characters.keys.letters),
   keyModifierUpper: characters.keys.modifiers.upperCase,
   keyModifierUnicode: characters.keys.modifiers.unicode,
