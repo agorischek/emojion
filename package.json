@@ -23,7 +23,7 @@
     "lint": "eslint src/**/*.ts",
     "prepublishOnly": "npm run build",
     "prebuild": "npm run clean && npm run format && npm run lint && echo Using TypeScript && tsc --version",
-    "build": "npm run build:grammar && npm run build:lib && npm run build bundle",
+    "build": "npm run build:grammar && npm run build:lib && npm run build:bundle",
     "build:grammar": "mkdir -p gen && nearleyc src/grammar.ne -o gen/grammar.ts && replace-in-file \"Lexer: lexer,\" \"// @ts-ignore\nLexer: lexer,\" gen/grammar.ts",
     "build:bundle": "npm run rollup",
     "build:lib": "tsc --pretty",
