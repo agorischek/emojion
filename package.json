@@ -24,7 +24,7 @@
     "prepublishOnly": "npm run build",
     "prebuild": "npm run clean && npm run format && npm run lint && echo Using TypeScript && tsc --version",
     "build": "npm run build:grammar && npm run build:scripts",
-    "build:grammar": "nearleyc src/grammar.ne -o gen/grammar.ts && replace-in-file \"Lexer: lexer,\" \"// @ts-ignore\nLexer: lexer,\" gen/grammar.ts",
+    "build:grammar": "mkdir -p gen && nearleyc src/grammar.ne -o gen/grammar.ts && replace-in-file \"Lexer: lexer,\" \"// @ts-ignore\nLexer: lexer,\" gen/grammar.ts",
     "build:scripts": "npm run lint && npm run rollup",
     "start": "npm run build && npm run test",
     "test": "npm run build:grammar && jest",
