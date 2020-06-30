@@ -2,6 +2,11 @@
 
 _Emoji Object Notation_
 
+[![Build Status](https://dev.azure.com/agorischek/packages/_apis/build/status/Emojion/Emojion%20CI?branchName=master)](https://dev.azure.com/agorischek/packages/_build?definitionScope=%5CEmojion)
+[![Dependencies](https://img.shields.io/depfu/agorischek/emojion.svg)](https://depfu.com/repos/agorischek/emojion)
+[![Version](https://img.shields.io/npm/v/emj.svg)](https://www.npmjs.com/package/emj)
+[![License](https://img.shields.io/github/license/agorischek/emojion.svg)](https://github.com/agorischek/emojion/blob/master/LICENSE)
+
 ```json
 {
   "name": "Emojion",
