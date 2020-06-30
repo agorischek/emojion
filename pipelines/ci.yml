@@ -23,10 +23,17 @@ steps:
   - task: Npm@1
     inputs:
       command: custom
+      customCommand: build
+    displayName: Build
+
+  - task: Npm@1
+    inputs:
+      command: custom
       customCommand: test
     displayName: Run tests
 
-  - script: cd $(Build.BinariesDirectory) && npm pack $(Build.Repository.LocalPath)
+  - script:
+      cd $(Build.BinariesDirectory) && npm pack $(Build.Repository.LocalPath)
     displayName: Create package
 
   - task: ArchiveFiles@2
