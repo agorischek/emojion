@@ -1,6 +1,6 @@
 variables:
   - name: artifactPipelineId
-    value: 9
+    value: 7
     readonly: true
 
 trigger: none
