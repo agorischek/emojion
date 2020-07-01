@@ -39,7 +39,7 @@
     "nearley": "^2.19.0"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.23",
+    "@types/jest": "^26.0.3",
     "@types/lodash": "^4.14.149",
     "@types/moo": "^0.5.0",
     "@types/nearley": "^2.11.0",
