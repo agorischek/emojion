@@ -34,7 +34,7 @@
     "watch:test": "jest --watch"
   },
   "dependencies": {
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "moo": "^0.5.1",
     "nearley": "^2.19.6"
   },
