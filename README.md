@@ -100,3 +100,23 @@ When your coworker tells you YAML is "too hard to read".
 Emojion is built with the excellent
 [Moo lexer](https://www.npmjs.com/package/moo) and
 [Nearley parser](https://nearley.js.org) engines.
+
+## Publishing
+
+Releases are published by the
+[`Publish Package`](./.github/workflows/publish.yml) GitHub Actions workflow
+using npm Trusted Publishing.
+
+Configure the `emj` package on npm with this trusted publisher:
+
+- Provider: GitHub Actions
+- Organization or user: `agorischek`
+- Repository: `emojion`
+- Workflow filename: `publish.yml`
+- Environment name: leave blank
+
+You can also configure it from an authenticated npm CLI:
+
+```sh
+npx npm@latest trust github emj --repo agorischek/emojion --file publish.yml
+```
