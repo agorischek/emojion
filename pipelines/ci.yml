@@ -10,9 +10,9 @@ steps:
   - checkout: self
     displayName: Check out source
 
-  - task: NodeTool@0
+  - task: UseNode@1
     inputs:
-      versionSpec: 24.x
+      version: 24.x
     displayName: Install Node
 
   - task: Npm@1
