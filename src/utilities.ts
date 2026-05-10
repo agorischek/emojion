@@ -18,7 +18,7 @@ export const makeRegexpFromValuesInObject = (dict: object) => {
 };
 
 export const makeRegexpFromValuesInMultipleObjects = (dicts: object[]) => {
-  const valuesArray = dicts.map(x => concatValuesFromObject(x));
+  const valuesArray = dicts.map((x) => concatValuesFromObject(x));
   const concatenation = valuesArray.reduce((acc, val) => acc.concat(val));
   const regexp = makeRegexp(concatenation);
   return regexp;
@@ -32,7 +32,7 @@ export const switchKeysAndValuesInObject = (dict: object) => {
 export const switchKeysAndValuesInMultipleObjectsThenMerge = (
   dicts: object[]
 ) => {
-  const flippedArray = dicts.map(x => switchKeysAndValuesInObject(x));
+  const flippedArray = dicts.map((x) => switchKeysAndValuesInObject(x));
   const merged = flippedArray.reduce((acc, val) => merge(acc, val));
   return merged;
 };

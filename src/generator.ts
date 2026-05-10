@@ -71,7 +71,7 @@ const processProperty = (input: IProperty) => {
   const convertedKey =
     input.key === ''
       ? characters.keys.other.empty
-      : [...input.key].map(i => convert.key(i)).join('');
+      : [...input.key].map((i) => convert.key(i)).join('');
   const convertedValue = processValue(input.value);
   const converted = convertedKey + convertedValue;
   return converted;
@@ -79,7 +79,7 @@ const processProperty = (input: IProperty) => {
 
 const processArray = (input: []) => {
   const converted = input
-    .map(x => processValue(x))
+    .map((x) => processValue(x))
     .join(characters.document.arrayDelimit);
   const generated: string =
     characters.document.arrayOpen + converted + characters.document.arrayClose;
@@ -90,7 +90,7 @@ const processString = (input: string) => {
   if (input === '') {
     return characters.values.other.emptyString;
   } else {
-    const convertedString = [...input].map(x => convert.value(x)).join('');
+    const convertedString = [...input].map((x) => convert.value(x)).join('');
     return convertedString;
   }
 };
@@ -105,7 +105,9 @@ const processBoolean = (input: boolean) => {
 
 const processNumber = (input: number) => {
   const inputString = input.toString();
-  const convertedNumber = [...inputString].map(x => convert.number(x)).join('');
+  const convertedNumber = [...inputString]
+    .map((x) => convert.number(x))
+    .join('');
   return convertedNumber;
 };
 

@@ -64,8 +64,8 @@ with `⏰` (because alarms are annoying).
 
 In keys, Unicode characters can be encoded using `🌎` followed by fruit, such as
 `🌎🍏🍊🍈🍓` for `U+0398` (which is `Θ`). In values, Unicode characters are
-encoded using `🗺` followed by office supplies, such as `🗺🖋🖊🧷🔎` for `U+0394`
-(which is `Δ`).
+encoded using `🗺` followed by office supplies, such as `🗺🖋🖊🧷🔎` for
+`U+0394` (which is `Δ`).
 
 See [`characters.ts`](./src/characters.ts) for the full character map.
 

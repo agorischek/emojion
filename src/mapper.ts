@@ -14,7 +14,7 @@ export const convert = {
         const encoded =
           characters.keys.modifiers.unicode +
           [...hexCodePointString]
-            .map(x => conversionTable.unicode.keys[x])
+            .map((x) => conversionTable.unicode.keys[x])
             .join('');
         return encoded;
       } else {
@@ -32,7 +32,7 @@ export const convert = {
         const encoded =
           characters.values.modifiers.unicode +
           [...hexCodePointString]
-            .map(x => conversionTable.unicode.values[x])
+            .map((x) => conversionTable.unicode.values[x])
             .join('');
         return encoded;
       } else {
