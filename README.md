@@ -3,7 +3,6 @@
 _Emoji Object Notation_
 
 [![CI](https://github.com/agorischek/emojion/actions/workflows/ci.yml/badge.svg)](https://github.com/agorischek/emojion/actions/workflows/ci.yml)
-[![Dependencies](https://img.shields.io/depfu/agorischek/emojion.svg)](https://depfu.com/repos/agorischek/emojion)
 [![Version](https://img.shields.io/npm/v/emj.svg)](https://www.npmjs.com/package/emj)
 [![License](https://img.shields.io/github/license/agorischek/emojion.svg)](https://github.com/agorischek/emojion/blob/master/LICENSE)
 
