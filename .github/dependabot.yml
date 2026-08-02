@@ -9,13 +9,42 @@ updates:
       time: "09:00"
       timezone: America/Los_Angeles
     cooldown:
-      default-days: 3
+      default-days: 7
+    versioning-strategy: increase-if-necessary
     groups:
-      routine-dependencies:
+      development-routine:
+        dependency-type: development
         patterns:
           - "*"
-    versioning-strategy: increase
-    open-pull-requests-limit: 2
+        exclude-patterns:
+          - typescript
+          - replace-in-file
+        update-types:
+          - minor
+          - patch
+      production-resolutions:
+        dependency-type: production
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # Runtime majors change the consumer contract and need deliberate review.
+      - dependency-name: lodash
+        update-types:
+          - version-update:semver-major
+      - dependency-name: moo
+        update-types:
+          - version-update:semver-major
+      - dependency-name: nearley
+        update-types:
+          - version-update:semver-major
+      # typescript-eslint 8.x cannot load TypeScript 7's native API yet.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
+    open-pull-requests-limit: 5
 
   - package-ecosystem: github-actions
     directory: "/"
@@ -25,9 +54,12 @@ updates:
       time: "09:00"
       timezone: America/Los_Angeles
     cooldown:
-      default-days: 3
+      default-days: 7
     groups:
       routine-actions:
         patterns:
           - "*"
-    open-pull-requests-limit: 1
+        update-types:
+          - minor
+          - patch
+    open-pull-requests-limit: 3
