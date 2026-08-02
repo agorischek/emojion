@@ -10,6 +10,7 @@ updates:
       timezone: America/Los_Angeles
     cooldown:
       default-days: 7
+    rebase-strategy: auto
     versioning-strategy: increase-if-necessary
     groups:
       development-routine:
@@ -55,6 +56,7 @@ updates:
       timezone: America/Los_Angeles
     cooldown:
       default-days: 7
+    rebase-strategy: auto
     groups:
       routine-actions:
         patterns:
