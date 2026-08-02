@@ -32,19 +32,6 @@ jobs:
           persist-credentials: false
           ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.version) || github.ref }}
 
-      - name: Set up Node
-        uses: actions/setup-node@v7
-        with:
-          node-version: '24'
-          registry-url: 'https://registry.npmjs.org'
-          package-manager-cache: false
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Audit dependencies
-        run: npm audit --audit-level=moderate
-
       - name: Check release state
         id: release_state
         env:
@@ -82,6 +69,22 @@ jobs:
             printf '%s\n' "$release_error" >&2
             exit "$release_status"
           fi
+
+      - name: Set up Node
+        if: steps.release_state.outputs.package_published != 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      - name: Install dependencies
+        if: steps.release_state.outputs.package_published != 'true'
+        run: npm ci
+
+      - name: Audit dependencies
+        if: steps.release_state.outputs.package_published != 'true'
+        run: npm audit --audit-level=moderate
 
       - name: Stamp publish manifest
         if: steps.release_state.outputs.package_published != 'true'
