@@ -25,18 +25,21 @@ _Emoji Object Notation_
 
 ## Use
 
-Call `parse()` to turn Emojion into a JavaScript object, and call `generate()`
-to go the other way.
+Call `parse()` to turn Emojion into its original JSON text string, and call
+`generate()` to turn JSON text into Emojion.
 
 ```ts
 import { generate, parse } from 'emj';
 
-const object = parse('🙌😶😠🤑😳👡🐘🐁🦉🦒🐖🦉🦏✋');
-// { name: "Emojion" }
+const json = parse('🙌😶😠🤑😳👡🐘🐁🦉🦒🐖🦉🦏✋');
+// '{"name":"Emojion"}'
 
-const emojion = generate({ created: 2019 });
+const emojion = generate(JSON.stringify({ created: 2019 }));
 // 🙌😖😭😳😠😛😳🤤🕑🕛🕐🕘✋
 ```
+
+Both functions use JSON text so every valid JSON value can round-trip without
+losing type information.
 
 ## Syntax
 
@@ -102,9 +105,18 @@ Emojion is built with the excellent
 
 ## Publishing
 
-Releases are published by the
-[`Publish Package`](./.github/workflows/publish.yml) GitHub Actions workflow
-using npm Trusted Publishing.
+Emojion is a maintained joke package: its premise is intentionally absurd, but
+its runtime dependencies and published security posture are maintained like any
+other library. Garden keeps development tooling and compatible lockfile
+resolutions current while runtime-range changes remain deliberate.
+
+Garden dispatches [`Prepare Release`](./.github/workflows/prepare-release.yml)
+with an exact semantic version. The tag is the release source of truth; the
+publisher checks out that immutable tag and stamps the package manifest only in
+its packaging worktree before publishing to npm and creating the matching GitHub
+Release. Routine releases are batched to at most one per week.
+
+Publishing uses npm Trusted Publishing.
 
 Configure the `emj` package on npm with this trusted publisher:
 
