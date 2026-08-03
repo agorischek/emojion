@@ -61,7 +61,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.6.0",
-    "npm-check-updates": "^22.1.1",
+    "npm-check-updates": "^23.0.0",
     "prettier": "^3.9.6",
     "replace-in-file": "^8.4.0",
     "rimraf": "^6.1.3",
