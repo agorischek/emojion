@@ -125,6 +125,7 @@ export const characters = {
       8: '🕗',
       9: '🕘',
       '.': '⛳️',
+      e: '🚀',
     },
     numerals: {
       0: '🌻',

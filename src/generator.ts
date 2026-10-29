@@ -1,116 +1,117 @@
 import { characters } from './characters';
-import { forOwn } from 'lodash';
-import { convert } from './mapper';
-import { typeOf } from './typer';
 
-export const generate = (input: any) => {
-  const parsed = JSON.parse(input);
-  const generated =
-    characters.document.start +
-    processDocument(parsed) +
-    characters.document.end;
-  return generated;
-};
+type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 
-const processDocument = (input: any) => {
-  const type = typeOf(input);
-  if (type === 'object') {
-    return processObject(input, true);
-  } else if (type === 'array') {
-    return processArray(input);
-  } else if (type === 'boolean') {
-    return processBoolean(input);
-  } else if (type === 'null') {
-    return processNull();
-  } else {
-    return '';
-  }
-};
+const KEYS = Array.from({ length: 128 }, () => '');
+const VALUES = Array.from({ length: 128 }, () => '');
 
-const processValue = (input: any) => {
-  const type = typeOf(input);
-  if (type === 'object') {
-    return processObject(input, false);
-  } else if (type === 'array') {
-    return processArray(input);
-  } else if (type === 'string') {
-    return processString(input);
-  } else if (type === 'boolean') {
-    return processBoolean(input);
-  } else if (type === 'number') {
-    return processNumber(input);
-  } else if (type === 'null') {
-    return processNull();
-  } else {
-    return '';
-  }
-};
-
-const processObject = (input: object, isRoot: boolean) => {
-  const convertedProperties: string[] = [];
-  forOwn(input, (value, key) => {
-    convertedProperties.push(processProperty({ key, value }));
-  });
-  if (isRoot) {
-    return convertedProperties.join('');
-  } else {
-    return (
-      characters.document.indent +
-      convertedProperties.join('') +
-      characters.document.outdent
-    );
-  }
-};
-
-interface IProperty {
-  key: string;
-  value: string;
+for (const [char, emoji] of Object.entries(characters.keys.letters)) {
+  KEYS[char.charCodeAt(0)] = emoji;
+  KEYS[char.toUpperCase().charCodeAt(0)] =
+    characters.keys.modifiers.upperCase + emoji;
+}
+for (const [char, emoji] of Object.entries(characters.keys.numerals)) {
+  KEYS[char.charCodeAt(0)] = emoji;
+}
+for (const [char, emoji] of Object.entries(characters.values.letters)) {
+  VALUES[char.charCodeAt(0)] = emoji;
+  VALUES[char.toUpperCase().charCodeAt(0)] =
+    characters.values.modifiers.upperCase + emoji;
+}
+for (const [char, emoji] of Object.entries(characters.values.numerals)) {
+  VALUES[char.charCodeAt(0)] = emoji;
 }
 
-const processProperty = (input: IProperty) => {
-  const convertedKey =
-    input.key === ''
-      ? characters.keys.other.empty
-      : [...input.key].map((i) => convert.key(i)).join('');
-  const convertedValue = processValue(input.value);
-  const converted = convertedKey + convertedValue;
-  return converted;
+const KEY_NIBBLES: Record<string, string> = characters.keys.unicode;
+const VALUE_NIBBLES: Record<string, string> = characters.values.unicode;
+
+const NUMBERS: Record<string, string> = {
+  ...characters.values.numbers,
+  '-': characters.values.modifiers.negative,
+  '+': '',
 };
 
-const processArray = (input: []) => {
-  const converted = input
-    .map((x) => processValue(x))
-    .join(characters.document.arrayDelimit);
-  const generated: string =
-    characters.document.arrayOpen + converted + characters.document.arrayClose;
-  return generated;
-};
-
-const processString = (input: string) => {
-  if (input === '') {
-    return characters.values.other.emptyString;
-  } else {
-    const convertedString = [...input].map((x) => convert.value(x)).join('');
-    return convertedString;
+function encode(
+  text: string,
+  table: string[],
+  unicode: string,
+  nibbles: Record<string, string>
+): string {
+  let out = '';
+  for (let i = 0; i < text.length; i++) {
+    const emoji = table[text.charCodeAt(i)];
+    if (emoji) {
+      out += emoji;
+      continue;
+    }
+    const point = text.codePointAt(i)!;
+    if (point > 0xffff) i++;
+    out += unicode;
+    for (const hex of point.toString(16)) out += nibbles[hex];
   }
-};
+  return out;
+}
 
-const processBoolean = (input: boolean) => {
-  if (input === true) {
-    return characters.values.booleans.true;
-  } else {
-    return characters.values.booleans.false;
+function encodeObject(object: { [key: string]: Json }): string {
+  let out = '';
+  for (const key of Object.keys(object)) {
+    out += key
+      ? encode(key, KEYS, characters.keys.modifiers.unicode, KEY_NIBBLES)
+      : characters.keys.other.empty;
+    out += encodeValue(object[key]);
   }
-};
+  return out;
+}
 
-const processNumber = (input: number) => {
-  const inputString = input.toString();
-  const convertedNumber = [...inputString]
-    .map((x) => convert.number(x))
-    .join('');
-  return convertedNumber;
-};
+function encodeValue(value: Json): string {
+  if (typeof value === 'string') {
+    return value
+      ? encode(
+          value,
+          VALUES,
+          characters.values.modifiers.unicode,
+          VALUE_NIBBLES
+        )
+      : characters.values.other.emptyString;
+  }
+  if (typeof value === 'number') {
+    let out = '';
+    for (const char of String(value)) out += NUMBERS[char];
+    return out;
+  }
+  if (typeof value === 'boolean') {
+    return value
+      ? characters.values.booleans.true
+      : characters.values.booleans.false;
+  }
+  if (value === null) return characters.values.other.null;
+  if (Array.isArray(value)) {
+    let out = characters.document.arrayOpen;
+    for (let i = 0; i < value.length; i++) {
+      if (i) out += characters.document.arrayDelimit;
+      out += encodeValue(value[i]);
+    }
+    return out + characters.document.arrayClose;
+  }
+  return (
+    characters.document.indent +
+    encodeObject(value) +
+    characters.document.outdent
+  );
+}
 
-const processNull = () => {
-  return characters.values.other.null;
+/**
+ * Convert JSON text into an Emojion document.
+ *
+ * @example
+ * generate('{"created":2019}');
+ * //=> '🙌😖😭😳😠😛😳🤤🕑🕛🕐🕘✋'
+ */
+export const generate = (input: string): string => {
+  const value: Json = JSON.parse(input);
+  const body =
+    value && typeof value === 'object' && !Array.isArray(value)
+      ? encodeObject(value)
+      : encodeValue(value);
+  return characters.document.start + body + characters.document.end;
 };
