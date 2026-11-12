@@ -152,14 +152,13 @@ function deepDoc() {
 
 // Emojion as a person might format it: one member per line, two-space
 // indentation, and U+FE0F after the emoji that usually carry it. Built from
-// `generate` on scalars so it never depends on generator internals.
+// `stringify` on scalars so it never depends on generator internals.
 const VS16 = new Set(['🕊', '🕳', '🗝', '🗺']);
 
-export function prettyEmojion(value, generate) {
+export function prettyEmojion(value, stringify) {
   const start = '🙌';
   const end = '✋';
-  const scalar = (v) =>
-    generate(JSON.stringify(v)).slice(start.length, -end.length);
+  const scalar = (v) => stringify(v).slice(start.length, -end.length);
   const key = (k) => scalar({ [k]: 0 }).slice(0, -'🕛'.length);
   const pad = (depth) => '\n' + '  '.repeat(depth);
   const members = (object, depth) =>
@@ -191,11 +190,13 @@ export function prettyEmojion(value, generate) {
 }
 
 /**
- * The documents to benchmark. `json` is the input to `generate`, `emojion` is
- * the input to `parse`, and `expected` is what `parse` must return. Pass the
- * `generate` of a known-good build; it only shapes the Emojion inputs.
+ * The documents to benchmark. `value` is the input to `stringify` and `json`
+ * the input to `JSON.parse`; `emojion` is the input to `parse`, and `expected`
+ * is the value `parse` must return (`value` as JSON would carry it, so -0
+ * becomes 0). Pass the `stringify` of a known-good build; it only shapes the
+ * Emojion inputs.
  */
-export function corpus(generate) {
+export function corpus(stringify) {
   const large = fixture('3.json');
   const values = {
     small: fixture('1.json'),
@@ -211,15 +212,24 @@ export function corpus(generate) {
   };
   const docs = Object.entries(values).map(([name, value]) => {
     const json = JSON.stringify(value);
-    return { name, json, emojion: generate(json), expected: json };
+    return {
+      name,
+      value,
+      json,
+      emojion: stringify(value),
+      expected: JSON.parse(json),
+    };
   });
-  // Same content as `large`, but both inputs carry whitespace: indented JSON
-  // into `generate`, and formatted Emojion with U+FE0F into `parse`.
+  // Same content as `large`, but the parse inputs carry whitespace: indented
+  // JSON, and formatted Emojion with U+FE0F. A value has no whitespace to
+  // carry, so there is nothing new here for `stringify` to measure.
   docs.push({
     name: 'pretty',
+    value: large,
     json: JSON.stringify(large, null, 2),
-    emojion: prettyEmojion(large, generate),
-    expected: JSON.stringify(large),
+    emojion: prettyEmojion(large, stringify),
+    expected: JSON.parse(JSON.stringify(large)),
+    parseOnly: true,
   });
   return docs;
 }

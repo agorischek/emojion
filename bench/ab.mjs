@@ -1,11 +1,19 @@
 // A/B benchmark of two builds of the library, interleaved in the same process.
 //
 //   node bench/ab.mjs <A> <B> [--procs 4] [--rounds 30] [--node <path>]
-//                     [--docs large,unicode] [--ops parse,generate] [--json out.json]
+//                     [--docs large,unicode] [--ops parse,stringify] [--json out.json]
 //
 // A and B are git refs, or `.` for the working tree. Append `@es2022` (or any
 // tsc target) to compile that build with a different target. Each build is
 // compiled to CommonJS with its own tsconfig, as `npm run build:lib` would.
+// Either side can also be `JSON`, the built-in JSON.parse and JSON.stringify,
+// as a reference.
+//
+// Every side is measured through the 0.2 API: `parse(emojion)` returns a
+// value and `stringify(value)` returns Emojion. A 0.1 build, whose parse()
+// returned JSON text and whose generate() took it, is measured the way a
+// caller would have to use it for the same result: JSON.parse(parse(x)) and
+// generate(JSON.stringify(v)).
 //
 // Why interleave: on this kind of machine, timings for the same code can move
 // by 2–3x between runs (core placement, thermals, other load). Running A and
@@ -17,6 +25,7 @@ import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 
 import { corpus } from './corpus.mjs';
 
@@ -39,6 +48,11 @@ const consume = (s) => {
   sink = (sink + s.charCodeAt(s.length >> 1)) | 0;
 };
 
+let kept;
+const keep = (value) => {
+  kept = value;
+};
+
 const now = () => Number(process.hrtime.bigint());
 
 function median(values) {
@@ -52,36 +66,75 @@ else await main();
 
 // ---------------------------------------------------------------- worker ---
 
+// Load one side of the comparison, adapted to the 0.2 API. With `fresh`, load
+// a separate module instance even if this build was loaded before.
+function load(dir, fresh = false) {
+  if (dir === 'JSON') {
+    return { json: true, parse: JSON.parse, stringify: JSON.stringify };
+  }
+  const require = createRequire(join(dir, 'x.js'));
+  if (fresh) {
+    const lib = join(dir, 'lib');
+    for (const file of Object.keys(require.cache)) {
+      if (file.startsWith(lib)) delete require.cache[file];
+    }
+  }
+  const lib = require('./lib/index.js');
+  if (typeof lib.stringify === 'function') {
+    return { json: false, parse: lib.parse, stringify: lib.stringify };
+  }
+  return {
+    json: false,
+    parse: (emojion) => JSON.parse(lib.parse(emojion)),
+    stringify: (value) => lib.generate(JSON.stringify(value)),
+  };
+}
+
 function worker({ dirs, rounds, docs: only, ops, sliceMs }) {
-  const builds = dirs.map((dir) =>
-    createRequire(join(dir, 'x.js'))('./lib/index.js')
-  );
-  const docs = corpus(builds[0].generate).filter(
+  const builds = dirs.map((dir) => load(dir));
+  const emojionDir = dirs.find((dir) => dir !== 'JSON');
+  if (!emojionDir) throw new Error('compare at least one Emojion build');
+  // Shape the corpus with a third, untimed instance. The first code to walk
+  // freshly built objects meets maps that V8 later deprecates (as a field
+  // widens from small integers to doubles, say), and the feedback it gathers
+  // there can leave its optimized code slower for good: stringify() ran
+  // ~1.6x slower in whichever build had built the corpus. A separate instance
+  // takes that hit, so both timed builds see the same, settled objects.
+  const reference = load(emojionDir, true);
+  const docs = corpus(reference.stringify).filter(
     (d) => !only || only.includes(d.name)
   );
+  for (const doc of docs) reference.stringify(doc.value);
 
-  // Both builds must agree with each other and with the expected output.
+  // Every side must return the expected value from parse, and the Emojion
+  // sides must write byte-identical documents.
   for (const doc of docs) {
-    const emojion = builds[0].generate(doc.json);
+    const emojion = reference.stringify(doc.value);
     for (const build of builds) {
-      if (build.generate(doc.json) !== emojion)
-        throw new Error(`generate differs: ${doc.name}`);
-      if (build.parse(doc.emojion) !== doc.expected)
+      const input = build.json ? doc.json : doc.emojion;
+      if (!isDeepStrictEqual(build.parse(input), doc.expected))
         throw new Error(`parse wrong: ${doc.name}`);
+      if (!build.json && build.stringify(doc.value) !== emojion)
+        throw new Error(`stringify differs: ${doc.name}`);
     }
   }
 
   const cases = [];
   for (const doc of docs) {
     for (const op of ops) {
-      const input = op === 'parse' ? doc.emojion : doc.json;
+      if (op === 'stringify' && doc.parseOnly) continue;
       cases.push({
         doc: doc.name,
         op,
         fns: builds.map((b) => {
           const fn = b[op];
+          const input =
+            op === 'stringify' ? doc.value : b.json ? doc.json : doc.emojion;
+          // stringify returns a string to flatten; parse returns a value,
+          // which only needs to be kept.
+          const use = op === 'stringify' ? consume : keep;
           return (n) => {
-            for (let i = 0; i < n; i++) consume(fn(input));
+            for (let i = 0; i < n; i++) use(fn(input));
           };
         }),
       });
@@ -126,12 +179,13 @@ function worker({ dirs, rounds, docs: only, ops, sliceMs }) {
     a: c.times[0],
     b: c.times[1],
   }));
-  process.stdout.write(JSON.stringify({ sink, cases: out }));
+  process.stdout.write(JSON.stringify({ sink, kept: typeof kept, cases: out }));
 }
 
 // ------------------------------------------------------------------ main ---
 
 function build(spec) {
+  if (spec === 'JSON') return { spec, sha: 'built-in', dir: 'JSON' };
   const [ref, target] = spec.split('@');
   const sha =
     ref === '.'
@@ -177,19 +231,25 @@ async function main() {
   const sliceMs = Number(option('slice', 4));
   const node = option('node', process.execPath);
   const docs = option('docs')?.split(',');
-  const ops = option('ops', 'generate,parse').split(',');
+  const ops = option('ops', 'stringify,parse').split(',');
+  for (const op of ops) {
+    if (op !== 'stringify' && op !== 'parse') {
+      console.error(`unknown op "${op}": use parse or stringify`);
+      process.exit(2);
+    }
+  }
   const jsonOut = option('json');
   const [specA, specB] = args;
   if (!specA || !specB) {
     console.error(
-      'usage: node bench/ab.mjs <A> <B> [--procs N] [--rounds N] [--node path] [--docs a,b] [--ops parse,generate] [--json file]'
+      'usage: node bench/ab.mjs <A|JSON> <B|JSON> [--procs N] [--rounds N] [--node path] [--docs a,b] [--ops parse,stringify] [--json file]'
     );
     process.exit(2);
   }
 
   const A = build(specA);
   const B = build(specB);
-  if (A.dir === B.dir) {
+  if (A.dir === B.dir && A.dir !== 'JSON') {
     // An A/A run: load the same code from two paths so each is its own module.
     const copy = `${A.dir}-copy`;
     rmSync(copy, { recursive: true, force: true });

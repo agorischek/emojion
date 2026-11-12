@@ -1,5 +1,13 @@
 # Performance experiments
 
+> **API change in 0.2 (#102).** `parse()` now returns a value and `generate()`
+> became `stringify()`, which takes a value. The harness measures the 0.2 API:
+> `npm run bench:ab` times `parse` and `stringify`, and runs a 0.1 build the way
+> a caller would get the same result, as `JSON.parse(parse(x))` and
+> `generate(JSON.stringify(v))`. Everything up to
+> [The native-object API](#the-native-object-api-102) was measured on 0.1, so
+> `generate` there means 0.1's `generate(json)`.
+
 The question: can `parse` and `generate` in 0.1.0 go meaningfully faster? I ran
 34 A/B measurements: 21 isolated experiments and a compile-target check against
 0.1.0, 9 follow-ups on top of the best parse change, and 3 combinations of
@@ -189,6 +197,9 @@ branches it combines. `generate`: −3% … +1.6% against g02+g03+g04+g08. `pars
 
 ## Merging alongside the native-object rewrite (#102)
 
+_Done: #102 merged master with these changes, as described here. Measurements
+are in [The native-object API](#the-native-object-api-102)._
+
 - **Parser table (p02).** This only touches the token table, `lookup()` and
   `next()`. #102 leaves those alone, so it should merge without conflicts and
   the speedup carries over. #102's per-token work is the same; only the emitted
@@ -211,13 +222,147 @@ branches it combines. `generate`: −3% … +1.6% against g02+g03+g04+g08. `pars
 - **Suggested order:** either order works. Merging this first and rebasing #102
   means resolving three call sites in `generator.ts`.
 
+## The native-object API (#102)
+
+#102 replaces JSON text with values on both sides, on top of the changes above.
+`parse()` builds objects and arrays as it reads, and `stringify()` walks the
+value and calls `encode()` directly. Here it is against master with #104, each
+side used for the same job: getting a value from Emojion, and Emojion from a
+value.
+
+- **A** = master (641e4b8, the 0.1 API with #104): `JSON.parse(parse(x))` and
+  `generate(JSON.stringify(v))`.
+- **B** = #102: `parse(x)` and `stringify(v)`.
+
+The harness checks that both sides return deep-equal values from `parse` and
+byte-identical Emojion from `stringify` before timing.
+
+### Node 24.13, 6 processes
+
+Every process agreed on the direction of every row except `parse medium`, which
+is within noise. Per-process ranges are in the appendix.
+
+| doc     | `parse` A → B    |      Δ | `stringify` A → B |      Δ |
+| ------- | ---------------- | -----: | ----------------- | -----: |
+| small   | 746 → 489 ns     | −34.5% | 444 → 249 ns      | −43.8% |
+| medium  | 5.41 → 5.37 µs   |  −0.7% | 2.98 → 1.75 µs    | −41.4% |
+| large   | 104.0 → 86.7 µs  | −16.5% | 50.6 → 33.0 µs    | −35.0% |
+| xlarge  | 829 → 690 µs     | −16.3% | 415 → 281 µs      | −32.2% |
+| unicode | 174.4 → 116.8 µs | −33.1% | 106.5 → 85.6 µs   | −19.8% |
+| numbers | 92.6 → 86.6 µs   |  −6.7% | 111.9 → 60.2 µs   | −46.4% |
+| wide    | 163.6 → 166.0 µs |  +1.4% | 145.7 → 66.7 µs   | −53.9% |
+| array   | 97.8 → 65.7 µs   | −32.9% | 83.6 → 50.0 µs    | −40.3% |
+| records | 125.4 → 104.6 µs | −16.7% | 88.8 → 50.0 µs    | −43.8% |
+| deep    | 99.4 → 91.9 µs   |  −7.5% | 122.2 → 66.6 µs   | −45.7% |
+| pretty  | 118.5 → 101.4 µs | −14.1% | (parse only)      |        |
+
+- **`stringify` gains the most.** It skips both `JSON.stringify` and
+  `JSON.parse`, so #104's encoder speedups now show undiluted. That's the 20–54%
+  here, against #104's own 16–48% on `generate`.
+- **`parse` gains less, and it varies.** It no longer builds JSON text or
+  escapes strings, but it now builds objects, and building them costs about what
+  `JSON.parse` did. The biggest gains are where strings needed escaping
+  (`unicode`, `small`) or values are plain (`array`). Key-heavy documents
+  (`medium`, `wide`) break even: those are mostly object construction, plus the
+  check that keeps keys like `__proto__` from running `Object.prototype`'s
+  setters.
+
+### Node 20.20, 4 processes
+
+| doc     | `parse` Δ | `stringify` Δ (median) | `stringify` per-process range |
+| ------- | --------: | ---------------------: | ----------------------------- |
+| small   |    −41.6% |                 −43.6% | −57.4% … −21.3%               |
+| medium  |     −6.4% |                 −28.5% | −48.2% … +2.4%                |
+| large   |    −22.9% |                 −11.4% | −36.0% … +26.8%               |
+| xlarge  |    −24.4% |                  −6.0% | −32.7% … +32.3%               |
+| unicode |    −27.8% |                 −10.2% | −23.1% … +9.7%                |
+| numbers |    −11.8% |                 −48.9% | −50.3% … −48.6%               |
+| wide    |     −2.8% |                 −39.8% | −53.0% … −23.1%               |
+| array   |    −38.8% |                 −29.2% | −41.8% … −21.4%               |
+| records |    −20.6% |                 −32.5% | −48.4% … −12.2%               |
+| deep    |    −10.4% |                 −45.1% | −52.2% … −38.5%               |
+| pretty  |    −20.3% |                        |                               |
+
+`parse` is as steady as on Node 24, with every process within a few points.
+`stringify` is not: on Node 20 it runs in one of two states, so its medians fall
+between them. For `large`, the two states are about 41 µs and about 84 µs,
+against 66 µs for A. See the caveat below.
+
+### Against the built-in `JSON` (Node 24.13, 6 processes)
+
+`npm run bench:ab -- JSON .` runs `JSON.parse(json)` and `JSON.stringify(v)` as
+side A. Each row is how many times longer #102 takes than the built-in, on the
+same document:
+
+| doc     |            `stringify` |                 `parse` |
+| ------- | ---------------------: | ----------------------: |
+| small   | 2.7× (248 ns vs 93 ns) | 3.6× (488 ns vs 135 ns) |
+| medium  |                   3.4× |                    7.4× |
+| large   |                   4.5× |                    8.1× |
+| xlarge  |                   4.9× |                    8.2× |
+| unicode |                   9.7× |                   10.9× |
+| numbers |                   2.2× |                    5.4× |
+| wide    |                   2.5× |                    3.5× |
+| array   |                   3.7× |                    3.6× |
+| records |                   2.9× |                    4.4× |
+| deep    |                   1.2× |                    2.8× |
+| pretty  |                        |                    8.1× |
+
+The built-ins are native code. Emojion documents also run 1.1–3.9 times as many
+UTF-16 code units as the same JSON (for example 16,965 against 7,830 for
+`large`, and 28,137 against 7,239 for `unicode`, whose text is all escapes).
+That is why `unicode` shows the widest gap.
+
+### Noise
+
+Same build on both sides (A/A):
+
+- **Node 24, 6 processes.** Every row's median was within ±1.3%. Per-process
+  medians were within ±4%, except `stringify deep` (−7.8% … +8.5%).
+- **Node 20, 4 processes.** Every row's median was within +2.5%, and per-process
+  medians were within −7% … +6.6%.
+
+### Caveat: `stringify` speed depends on the caller's objects
+
+`stringify()` now walks the caller's objects instead of fresh `JSON.parse`
+output, and V8 makes that sensitive to the objects' history. While objects are
+being built, V8 deprecates some of their hidden classes (for example, when a
+field that held small integers gets a double). The first JavaScript code to walk
+those objects migrates them, deoptimizes over and over ("wrong map"), and can
+keep slower optimized code afterwards.
+
+- On Node 24, a `stringify` that had first walked the freshly built corpus
+  stayed about 1.6× slower on `large` (about 50 µs against 31 µs), for as long
+  as I measured.
+- Replacing the `toJSON` and unboxing steps with a no-op didn't change that, so
+  it comes from walking the objects, not from the `JSON.stringify` rules.
+- On Node 20, having the 0.1 build (with its `JSON.parse` calls) in the same
+  process was enough to put `stringify` in the slow state in some processes.
+  That is the spread in the Node 20 table.
+
+The harness shapes the corpus with a third, untimed instance of the build. That
+way the load order doesn't decide which timed build walks the fresh objects
+first, and A/A runs stay within the noise above.
+
+Real programs get whatever state their own objects lead to. A first harness run,
+without the third instance, put #102 in the slow state in every process. Against
+0.1 it was then 15–40% slower on the text-heavy documents (small, medium, large,
+xlarge, unicode), and still 16–46% faster on numbers, wide, array and deep. 0.1
+largely avoided this because `generate` walked fresh `JSON.parse` output.
+
 ## Reproducing
 
 ```sh
+npm run bench                                           # this build, with JSON.parse/stringify rows
 npm run bench:ab -- <base-ref> <candidate-ref>          # Node 24, 4 processes
 npm run bench:ab -- <base> <candidate> --node ~/.nvm/versions/node/v20.20.2/bin/node
 npm run bench:ab -- <ref> <ref>@es2022                  # compile-target check
+npm run bench:ab -- JSON <ref>                          # against the built-in JSON
+npm run bench:ab -- <ref> <ref> --ops stringify         # one operation only
 ```
+
+A 0.1 ref (before #102) is measured through the adapter described at the top, so
+it can be compared with a 0.2 ref.
 
 The experiment branches (`exp/*`, `r2/*`, `combo/*`) are local to the machine
 that ran them. Each experiment is described precisely enough above to redo.
@@ -286,3 +431,12 @@ The first row is p02 against 0.1.0. Every other row is measured against p02.
 | g02+g03+g04 vs 0.1.0  | −14.6 |  −10.5 | −28.6 |  −28.4 |   −43.5 |   −24.3 |  −2.3 |  −6.6 |    −5.4 |  −4.7 |  −28.3 |
 | + g08, vs g02+g03+g04 | −24.5 |  −26.9 | −25.6 |  −25.6 |    −4.7 |    −0.3 | −14.4 |  −9.7 |   −16.3 |  −7.4 |  −24.5 |
 | + g01, vs g02+g03+g04 |  +6.6 |  +20.2 |  −8.4 |  −10.9 |    −4.1 |    +1.0 | +19.7 |  +1.3 |   −20.0 | −19.5 |   −8.1 |
+
+### #102 against master (641e4b8), Node 24.13, 6 processes
+
+Δ is the median; the range is the spread of per-process medians.
+
+| op        | small                 | medium                | large                 | xlarge                | unicode               | numbers               | wide                  | array                 | records               | deep                  | pretty                |
+| --------- | --------------------- | --------------------- | --------------------- | --------------------- | --------------------- | --------------------- | --------------------- | --------------------- | --------------------- | --------------------- | --------------------- |
+| parse     | −34.5 (−35.2 … −33.2) | −0.7 (−2.2 … +0.8)    | −16.5 (−17.3 … −15.7) | −16.3 (−17.2 … −15.7) | −33.1 (−33.6 … −32.1) | −6.7 (−7.4 … −5.8)    | +1.4 (+0.2 … +3.5)    | −32.9 (−34.2 … −31.5) | −16.7 (−18.2 … −12.1) | −7.5 (−10.2 … −6.0)   | −14.1 (−15.4 … −13.5) |
+| stringify | −43.8 (−44.7 … −43.2) | −41.4 (−42.0 … −40.7) | −35.0 (−35.9 … −33.9) | −32.2 (−33.3 … −31.0) | −19.8 (−21.1 … −19.0) | −46.4 (−47.0 … −45.6) | −53.9 (−54.6 … −53.4) | −40.3 (−40.8 … −40.1) | −43.8 (−45.3 … −42.4) | −45.7 (−47.7 … −42.4) |                       |

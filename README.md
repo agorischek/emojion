@@ -25,22 +25,115 @@ _Emoji Object Notation_
 
 ## Use
 
-Call `parse()` to turn Emojion into its original JSON text string, and call
-`generate()` to turn JSON text into Emojion.
-
-```ts
-import { generate, parse } from 'emj';
-
-const json = parse('🙌😶😠🤑😳👡🐘🐁🦉🦒🐖🦉🦏✋');
-// '{"name":"Emojion"}'
-
-const emojion = generate(JSON.stringify({ created: 2019 }));
-// 🙌😖😭😳😠😛😳🤤🕑🕛🕐🕘✋
+```sh
+npm install emj
 ```
 
-Both functions use JSON text so every valid JSON value can round-trip without
-losing type information. `parse()` throws a `SyntaxError` if its input is not
-valid Emojion.
+`emj` works like the built-in `JSON` object. `parse()` turns Emojion into a
+JavaScript value, and `stringify()` turns a value into Emojion.
+
+```ts
+import { parse, stringify } from 'emj';
+
+const value = parse('🙌😶😠🤑😳👡🐘🐁🦉🦒🐖🦉🦏✋');
+// { name: 'Emojion' }
+
+const emojion = stringify({ created: 2019 });
+// '🙌😖😭😳😠😛😳🤤🕑🕛🕐🕘✋'
+
+parse(stringify({ when: new Date(0), list: [1, undefined] }));
+// { when: '1970-01-01T00:00:00.000Z', list: [1, null] }
+```
+
+It works in Node 10 and later, from CommonJS (`require('emj')`) or ESM.
+
+### `parse(emojion)`
+
+Reads an Emojion document and returns the value it holds: an object, array,
+string, number, boolean or `null`, built the same way `JSON.parse()` would build
+it.
+
+- Objects are plain objects and arrays are plain arrays.
+- A `__proto__` key becomes an ordinary own property; it never sets the
+  prototype. The same goes for any other key that `Object.prototype` has, such
+  as `toString`.
+- When a key repeats, the last value wins.
+- Numbers are converted the way `JSON.parse()` converts them, so `⏰🕛` is `-0`
+  and digits beyond double precision are rounded.
+
+### `stringify(value)`
+
+Writes a value as an Emojion document, following the rules of
+`JSON.stringify()`:
+
+- It calls a value's `toJSON()` method, so a `Date` becomes its ISO string.
+- It unwraps `new Number()`, `new String()` and `new Boolean()`.
+- It writes `NaN`, `Infinity` and `-Infinity` as `null`, and `-0` as `0`.
+- In objects, it skips properties whose value is `undefined`, a function or a
+  symbol. In arrays, it writes them, and holes, as `null`.
+- It writes only own enumerable string keys, so symbol keys are skipped, and a
+  `Map`, `Set` or class instance becomes an object of its own properties.
+
+`stringify()` has no `replacer` or `space` argument, and `parse()` has no
+`reviver`.
+
+### Errors and limits
+
+- `parse()` throws a `SyntaxError` for input that is not valid Emojion. The
+  message names the unexpected emoji and its position.
+- `stringify()` throws a `TypeError` for a `BigInt` (unless `BigInt.prototype`
+  has a `toJSON()`) and for a circular structure.
+- `stringify()` also throws a `TypeError` for a value Emojion cannot hold at
+  all: `undefined`, a function or a symbol on its own, or a `toJSON()` that
+  returns one. `JSON.stringify()` returns `undefined` in those cases, but every
+  Emojion document holds a value.
+- Arrays and objects can be nested up to 512 levels deep. A top-level object
+  doesn't count, because it has no `👉👈`. Past that, `parse()` throws a
+  `SyntaxError` and `stringify()` throws a `RangeError`.
+
+### TypeScript
+
+The package ships type definitions. `parse()` returns the exported `Json` type:
+
+```ts
+import type { Json } from 'emj';
+// string | number | boolean | null | Json[] | { [key: string]: Json }
+```
+
+`stringify()` accepts `unknown`, as `JSON.stringify()` accepts any value.
+
+### JSON text
+
+To convert between Emojion and JSON text, combine the two with `JSON`:
+
+```ts
+const toJson = (emojion: string) => JSON.stringify(parse(emojion));
+const fromJson = (json: string) => stringify(JSON.parse(json));
+```
+
+### Migrating from 0.1
+
+In 0.1, both functions worked with JSON text. In 0.2 they work with values.
+
+| 0.1                               | 0.2                              |
+| --------------------------------- | -------------------------------- |
+| `JSON.parse(parse(emojion))`      | `parse(emojion)`                 |
+| `parse(emojion)`                  | `JSON.stringify(parse(emojion))` |
+| `generate(json)`                  | `stringify(JSON.parse(json))`    |
+| `generate(JSON.stringify(value))` | `stringify(value)`               |
+
+- `generate()` is gone. Use `stringify()`, which takes a value, not JSON text.
+  Passing JSON text to `stringify()` writes it as a string, so make sure every
+  old `generate(json)` call becomes `stringify(JSON.parse(json))`.
+- `parse()` returns a value, not a string. If you kept the 0.1 JSON text without
+  parsing it, note that a repeated key was in the text twice; now only the last
+  value is kept, as `JSON.parse()` would have done.
+- `stringify()` applies the `JSON.stringify()` rules above itself. A `BigInt`, a
+  circular structure, or a top-level `undefined`, function or symbol throws a
+  `TypeError` from `stringify()` rather than from your own `JSON.stringify()`
+  call (or, for a top-level `undefined`, rather than passing `undefined` on).
+- The `RangeError` for deep nesting now says "Value nesting exceeds 512 levels"
+  instead of "JSON nesting exceeds 512 levels".
 
 ## Syntax
 
@@ -105,5 +198,9 @@ When your coworker tells you YAML is "too hard to read".
 
 ## Tech
 
-Emojion has no runtime dependencies. It reads each document in a single pass
-with a hand-written parser. Run `npm run bench` to measure its speed.
+Emojion has no runtime dependencies. `parse()` reads each document in a single
+pass with a hand-written parser that builds values as it goes, and `stringify()`
+walks the value directly; neither goes through JSON text. Run `npm run bench` to
+measure their speed next to `JSON.parse()` and `JSON.stringify()`, or
+`npm run bench:ab -- <ref> <ref>` to compare two versions. See
+[`bench/RESULTS.md`](./bench/RESULTS.md) for measurements.
