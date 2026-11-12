@@ -31,10 +31,32 @@ const Kind = {
   Null: 26,
 } as const;
 
-const TOKENS = new Map<number, number>();
+// Each token is `kind | code << 8`, looked up by code point in a typed array:
+// one for the BMP (where spaces and a few emoji live) and one for the block
+// of astral emoji, U+1F300–U+1FAFF. Unlisted code points stay Invalid.
+// This makes parse() 19–31% faster than a Map did (see bench/RESULTS.md).
+const ASTRAL_START = 0x1f300;
+const ASTRAL_SIZE = 0x800;
+const BMP_TOKENS = new Uint16Array(0x10000).fill(Kind.Invalid);
+const ASTRAL_TOKENS = new Uint16Array(ASTRAL_SIZE).fill(Kind.Invalid);
+
+function lookup(point: number): number {
+  if (point < 0x10000) return BMP_TOKENS[point];
+  const offset = point - ASTRAL_START;
+  return offset >= 0 && offset < ASTRAL_SIZE
+    ? ASTRAL_TOKENS[offset]
+    : Kind.Invalid;
+}
+
+function setToken(point: number, token: number) {
+  const offset = point - ASTRAL_START;
+  if (point < 0x10000) BMP_TOKENS[point] = token;
+  else if (offset >= 0 && offset < ASTRAL_SIZE) ASTRAL_TOKENS[offset] = token;
+  else throw new Error(`U+${point.toString(16)} is outside the token table`);
+}
 
 const define = (emoji: string, kind: number, code = 0) => {
-  TOKENS.set(emoji.codePointAt(0)!, kind | (code << 8));
+  setToken(emoji.codePointAt(0)!, kind | (code << 8));
 };
 
 define(characters.document.start, Kind.Start);
@@ -85,7 +107,7 @@ for (const space of [
   0x2004, 0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200a, 0x2028, 0x2029,
   0x202f, 0x205f, 0x3000, 0xfeff, 0xfe0f,
 ]) {
-  TOKENS.set(space, Kind.Space);
+  setToken(space, Kind.Space);
 }
 
 let source = '';
@@ -101,7 +123,7 @@ function next(): number {
     at = index;
     point = source.codePointAt(index)!;
     index += point > 0xffff ? 2 : 1;
-    const token = TOKENS.get(point) ?? Kind.Invalid;
+    const token = lookup(point);
     if (token === Kind.Space) continue;
     kind = token & 0xff;
     code = token >> 8;
