@@ -333,4 +333,28 @@ describe('Parser', () => {
     expect(() => parse(document)).toThrow(SyntaxError);
     expect(() => parse(document)).toThrow(message);
   });
+
+  const arrays = (depth: number) =>
+    '🙌' + '🤜'.repeat(depth) + '🤛'.repeat(depth) + '✋';
+  const objects = (depth: number) =>
+    '🙌' + '😠👉'.repeat(depth) + '👈'.repeat(depth) + '✋';
+
+  test('Should parse nesting up to the limit', () => {
+    expect(parse(arrays(512))).toBe('['.repeat(512) + ']'.repeat(512));
+    expect(parse(objects(512))).toBe(
+      '{' + '"a":{'.repeat(512) + '}'.repeat(513)
+    );
+  });
+
+  test('Should throw on nesting past the limit', () => {
+    expect(() => parse(arrays(513))).toThrow(
+      /nesting exceeds 512 levels at position 1026/
+    );
+    expect(() => parse(objects(513))).toThrow(SyntaxError);
+  });
+
+  test('Should throw a SyntaxError on very deep nesting', () => {
+    expect(() => parse(arrays(10000))).toThrow(SyntaxError);
+    expect(parse('🙌😠🐜✋')).toBe('{"a":"a"}');
+  });
 });

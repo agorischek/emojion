@@ -1,4 +1,5 @@
 import { characters } from './characters';
+import { MAX_DEPTH } from './limits';
 
 const Kind = {
   EOF: 0,
@@ -93,6 +94,7 @@ let at = 0;
 let point = 0;
 let kind: number = Kind.EOF;
 let code = 0;
+let depth = 0;
 
 function next(): number {
   while (index < source.length) {
@@ -117,6 +119,14 @@ function fail(): never {
   throw new SyntaxError(
     `Unexpected "${String.fromCodePoint(point)}" in Emojion at position ${at}`
   );
+}
+
+function nest() {
+  if (++depth > MAX_DEPTH) {
+    throw new SyntaxError(
+      `Emojion nesting exceeds ${MAX_DEPTH} levels at position ${at}`
+    );
+  }
 }
 
 function expect(expected: number) {
@@ -235,13 +245,19 @@ function array(): string {
 function value(): string {
   switch (kind) {
     case Kind.Indent: {
+      nest();
       next();
       const out = members(Kind.Outdent);
       next();
+      depth--;
       return out;
     }
-    case Kind.Open:
-      return array();
+    case Kind.Open: {
+      nest();
+      const out = array();
+      depth--;
+      return out;
+    }
     case Kind.True:
       next();
       return 'true';
@@ -281,6 +297,7 @@ function value(): string {
 export const parse = (input: string): string => {
   source = input;
   index = 0;
+  depth = 0;
   try {
     next();
     expect(Kind.Start);
