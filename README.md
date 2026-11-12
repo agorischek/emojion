@@ -106,32 +106,3 @@ When your coworker tells you YAML is "too hard to read".
 
 Emojion has no runtime dependencies. It reads each document in a single pass
 with a hand-written parser. Run `bun run bench` to measure its speed.
-
-## Publishing
-
-Emojion is a maintained joke package: its premise is intentionally absurd, but
-its runtime dependencies and published security posture are maintained like any
-other library. Garden keeps development tooling and compatible lockfile
-resolutions current while runtime-range changes remain deliberate.
-
-Garden dispatches [`Prepare Release`](./.github/workflows/prepare-release.yml)
-with an exact semantic version. The tag is the release source of truth; the
-publisher checks out that immutable tag and stamps the package manifest only in
-its packaging worktree before publishing to npm and creating the matching GitHub
-Release. Routine releases are batched to at most one per week.
-
-Publishing uses npm Trusted Publishing.
-
-Configure the `emj` package on npm with this trusted publisher:
-
-- Provider: GitHub Actions
-- Organization or user: `agorischek`
-- Repository: `emojion`
-- Workflow filename: `publish.yml`
-- Environment name: leave blank
-
-You can also configure it from an authenticated npm CLI:
-
-```sh
-npx npm@latest trust github emj --repo agorischek/emojion --file publish.yml
-```

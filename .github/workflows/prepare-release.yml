@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Exact v-prefixed semantic version requested by Garden
+        description: Exact v-prefixed semantic version to release
         required: true
         type: string
 
@@ -40,7 +40,7 @@ jobs:
             exit 1
           fi
           if ! printf '%s' "$VERSION" | grep -Eq '^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'; then
-            echo "::error::Garden version must be vMAJOR.MINOR.PATCH."
+            echo "::error::Release version must be vMAJOR.MINOR.PATCH."
             exit 1
           fi
           package_major="$(node -p "require('./package.json').version.split('.')[0]")"
