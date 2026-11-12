@@ -323,6 +323,12 @@ describe('Parser', () => {
     ['an unclosed array', '🙌😠🤜🕐✋', /Unexpected "✋"/],
     ['a trailing array delimiter', '🙌😠🤜🕐🤝🤛✋', /Unexpected "🤛"/],
     ['an unclosed object', '🙌😠👉🥺🕐✋', /Unexpected "✋"/],
+    [
+      'a wrapped top-level object',
+      '🙌👉😠🐜👈✋',
+      /Unexpected "👉" in Emojion at position 2/,
+    ],
+    ['a wrapped empty top-level object', '🙌👉👈✋', /Unexpected "👉"/],
   ])('Should throw on %s', (_, document, message) => {
     expect(() => parse(document)).toThrow(SyntaxError);
     expect(() => parse(document)).toThrow(message);

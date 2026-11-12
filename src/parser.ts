@@ -284,6 +284,8 @@ export const parse = (input: string): string => {
   try {
     next();
     expect(Kind.Start);
+    // A top-level object is written without 👉👈.
+    if (kind === Kind.Indent) fail();
     const out =
       kind === Kind.End ||
       kind === Kind.KeyEmpty ||
