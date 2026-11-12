@@ -1,4 +1,5 @@
 import { characters } from './characters';
+import type { Json } from './json';
 import { MAX_DEPTH } from './limits';
 
 const Kind = {
@@ -88,6 +89,8 @@ for (const space of [
   TOKENS.set(space, Kind.Space);
 }
 
+const OBJECT_PROTOTYPE = Object.prototype;
+
 let source = '';
 let index = 0;
 let at = 0;
@@ -141,7 +144,6 @@ function text(
   nibble: number
 ): string {
   let out = '';
-  let encoded = false;
   for (;;) {
     if (kind === char) {
       out += String.fromCharCode(code);
@@ -164,9 +166,8 @@ function text(
         next();
       } while (kind === nibble);
       out += String.fromCodePoint(value);
-      encoded = true;
     } else {
-      return encoded ? JSON.stringify(out) : '"' + out + '"';
+      return out;
     }
   }
 }
@@ -181,7 +182,7 @@ function digits(): string {
   return out;
 }
 
-function number(): string {
+function number(): number {
   let out = '';
   if (kind === Kind.Negative) {
     out = '-';
@@ -203,49 +204,63 @@ function number(): string {
       out += 'e-';
       next();
     } else {
-      out += 'e+';
+      out += 'e';
     }
     out += digits();
   }
-  return out;
+  return Number(out);
 }
 
-function members(close: number): string {
-  let out = '{';
+function members(close: number): { [key: string]: Json } {
+  const out: { [key: string]: Json } = {};
   while (kind !== close) {
-    if (out !== '{') out += ',';
+    let key = '';
     if (kind === Kind.KeyEmpty) {
-      out += '""';
       next();
     } else if (
       kind === Kind.KeyChar ||
       kind === Kind.KeyUpper ||
       kind === Kind.KeyUnicode
     ) {
-      out += text(Kind.KeyChar, Kind.KeyUpper, Kind.KeyUnicode, Kind.KeyNibble);
+      key = text(Kind.KeyChar, Kind.KeyUpper, Kind.KeyUnicode, Kind.KeyNibble);
     } else {
       fail();
     }
-    out += ':' + value();
+    const item = value();
+    if (key in OBJECT_PROTOTYPE) {
+      // Assigning a key that out inherits would run its setter (__proto__
+      // would set the prototype) or fail if it is read-only. Define it as
+      // an own property instead, as JSON.parse() does.
+      Object.defineProperty(out, key, {
+        value: item,
+        writable: true,
+        enumerable: true,
+        configurable: true,
+      });
+    } else {
+      // A repeated key overwrites the earlier one: the last wins.
+      out[key] = item;
+    }
   }
-  return out + '}';
+  return out;
 }
 
-function array(): string {
+function array(): Json[] {
+  const out: Json[] = [];
   if (next() === Kind.Close) {
     next();
-    return '[]';
+    return out;
   }
-  let out = '[' + value();
+  out.push(value());
   while (kind === Kind.Delimit) {
     next();
-    out += ',' + value();
+    out.push(value());
   }
   expect(Kind.Close);
-  return out + ']';
+  return out;
 }
 
-function value(): string {
+function value(): Json {
   switch (kind) {
     case Kind.Indent: {
       nest();
@@ -263,16 +278,16 @@ function value(): string {
     }
     case Kind.True:
       next();
-      return 'true';
+      return true;
     case Kind.False:
       next();
-      return 'false';
+      return false;
     case Kind.Null:
       next();
-      return 'null';
+      return null;
     case Kind.ValueEmpty:
       next();
-      return '""';
+      return '';
     case Kind.Negative:
     case Kind.Digit:
       return number();
@@ -290,14 +305,15 @@ function value(): string {
 }
 
 /**
- * Convert an Emojion document into JSON text.
- * Throws a `SyntaxError` if the document is not valid Emojion.
+ * Parse an Emojion document into the value it holds, the way `JSON.parse()`
+ * parses JSON text. Throws a `SyntaxError` if the document is not valid
+ * Emojion.
  *
  * @example
  * parse('🙌😶😠🤑😳👡🐘🐁🦉🦒🐖🦉🦏✋');
- * //=> '{"name":"Emojion"}'
+ * //=> { name: 'Emojion' }
  */
-export const parse = (input: string): string => {
+export const parse = (input: string): Json => {
   source = input;
   index = 0;
   depth = 0;

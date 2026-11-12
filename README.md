@@ -25,22 +25,42 @@ _Emoji Object Notation_
 
 ## Use
 
-Call `parse()` to turn Emojion into its original JSON text string, and call
-`generate()` to turn JSON text into Emojion.
+`emj` works like the built-in `JSON` object. Call `parse()` to turn Emojion into
+a JavaScript value, and call `stringify()` to turn a value into Emojion.
 
 ```ts
-import { generate, parse } from 'emj';
+import { parse, stringify } from 'emj';
 
-const json = parse('🙌😶😠🤑😳👡🐘🐁🦉🦒🐖🦉🦏✋');
-// '{"name":"Emojion"}'
+const value = parse('🙌😶😠🤑😳👡🐘🐁🦉🦒🐖🦉🦏✋');
+// { name: 'Emojion' }
 
-const emojion = generate(JSON.stringify({ created: 2019 }));
+const emojion = stringify({ created: 2019 });
 // 🙌😖😭😳😠😛😳🤤🕑🕛🕐🕘✋
 ```
 
-Both functions use JSON text so every valid JSON value can round-trip without
-losing type information. `parse()` throws a `SyntaxError` if its input is not
-valid Emojion.
+Emojion holds the same values as JSON, so `parse()` and `stringify()` follow the
+rules of `JSON.parse()` and `JSON.stringify()`:
+
+- `parse()` throws a `SyntaxError` if its input is not valid Emojion. A
+  `__proto__` key becomes an ordinary property, and when a key repeats, the last
+  value wins.
+- `stringify()` calls `toJSON()` (so a `Date` becomes a string) and unwraps
+  `new Number()`, `new String()` and `new Boolean()`. It writes `NaN`,
+  `Infinity` and `-Infinity` as `null`. It skips `undefined`, functions and
+  symbols in objects, and writes them as `null` in arrays.
+- `stringify()` throws a `TypeError` for a `BigInt` or a circular structure.
+  Where `JSON.stringify()` would return `undefined` (for `undefined`, a function
+  or a symbol on its own), `stringify()` throws a `TypeError`, because every
+  Emojion document holds a value.
+
+To convert between Emojion and JSON text, combine them with `JSON`:
+
+```ts
+const toJson = (emojion: string) => JSON.stringify(parse(emojion));
+const fromJson = (json: string) => stringify(JSON.parse(json));
+```
+
+TypeScript users can import the `Json` type, which `parse()` returns.
 
 ## Syntax
 

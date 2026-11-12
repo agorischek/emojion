@@ -1,8 +1,8 @@
-import { generate, parse } from '../src/index';
+import { parse, stringify } from '../src/index';
 import * as fs from 'fs';
 
-const readJson = (filePath: string) => {
-  return JSON.stringify(JSON.parse(fs.readFileSync(filePath, 'utf8')));
+const readJson = (filePath: string): unknown => {
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 };
 
 const readEmojion = (filePath: string) => {
@@ -10,30 +10,16 @@ const readEmojion = (filePath: string) => {
 };
 
 describe('Library', () => {
-  test('should round-trip doc1 (JSON)', () => {
-    const json = readJson('./test/docs/1.json');
-    const emojion = generate(json);
-    const parsed = parse(emojion);
-    expect(parsed).toEqual(json);
-  });
-  test('should round-trip doc2 (JSON)', () => {
-    const json = readJson('./test/docs/2.json');
-    const emojion = generate(json);
-    const parsed = parse(emojion);
-    expect(parsed).toEqual(json);
-  });
-  test('should round-trip doc3 (JSON)', () => {
-    const json = readJson('./test/docs/3.json');
-    const emojion = generate(json);
-    const parsed = parse(emojion);
-    expect(parsed).toEqual(json);
+  test.each(['1', '2', '3'])('should round-trip doc%s (JSON)', (name) => {
+    const value = readJson(`./test/docs/${name}.json`);
+    const emojion = stringify(value);
+    expect(parse(emojion)).toEqual(value);
   });
 
   test('should round-trip docA (Emojion)', () => {
     const emojion = readEmojion('./test/docs/A.🙌');
-    const json = parse(emojion);
-    const generated = generate(json);
-    expect(generated).toEqual(emojion);
+    const value = parse(emojion);
+    expect(stringify(value)).toBe(emojion);
   });
 
   test.each([
@@ -49,8 +35,16 @@ describe('Library', () => {
     '{"a":[],"b":[[],[[]]]}',
     '{"🙂":"😀"}',
   ])('should round-trip %s', (json) => {
-    const emojion = generate(json);
-    expect(parse(emojion)).toBe(json);
+    const value = JSON.parse(json);
+    const parsed = parse(stringify(value));
+    expect(parsed).toEqual(value);
+    expect(JSON.stringify(parsed)).toBe(json);
+  });
+
+  test('should round-trip -0', () => {
+    // JSON.stringify() writes -0 as 0, and so does stringify().
+    expect(Object.is(parse(stringify(-0)), 0)).toBe(true);
+    expect(Object.is(parse('🙌⏰🕛✋'), -0)).toBe(true);
   });
 
   test('should round-trip random documents', () => {
@@ -87,24 +81,37 @@ describe('Library', () => {
       );
     };
     for (let i = 0; i < 2000; i++) {
-      const json = JSON.stringify(value(0));
-      expect(parse(generate(json))).toBe(json);
+      const v = value(0);
+      const parsed = parse(stringify(v));
+      expect(parsed).toEqual(v);
+      expect(JSON.stringify(parsed)).toBe(JSON.stringify(v));
     }
   });
 
+  const nestedArrays = (depth: number) => {
+    let value: unknown = [];
+    for (let i = 1; i < depth; i++) value = [value];
+    return value;
+  };
+  const nestedObjects = (depth: number) => {
+    let value: unknown = {};
+    for (let i = 0; i < depth; i++) value = { a: value };
+    return value;
+  };
+
   test('should round-trip nesting up to the limit', () => {
-    const arrays = '['.repeat(512) + ']'.repeat(512);
-    const objects = '{' + '"a":{'.repeat(511) + '}'.repeat(512);
-    expect(parse(generate(arrays))).toBe(arrays);
-    expect(parse(generate(objects))).toBe(objects);
+    // A top-level object is not counted, as it has no 👉👈.
+    expect(parse(stringify(nestedArrays(512)))).toEqual(nestedArrays(512));
+    expect(parse(stringify(nestedObjects(512)))).toEqual(nestedObjects(512));
   });
 
-  test('should refuse to generate nesting past the limit', () => {
-    const json = '['.repeat(513) + ']'.repeat(513);
-    expect(() => generate(json)).toThrow(RangeError);
-    expect(() => generate(json)).toThrow(/nesting exceeds 512 levels/);
-    expect(() => generate('['.repeat(10000) + ']'.repeat(10000))).toThrow(
-      RangeError
+  test('should refuse to stringify nesting past the limit', () => {
+    expect(() => stringify(nestedArrays(513))).toThrow(RangeError);
+    expect(() => stringify(nestedArrays(513))).toThrow(
+      /nesting exceeds 512 levels/
     );
+    expect(() => stringify(nestedObjects(513))).toThrow(RangeError);
+    expect(() => stringify(nestedArrays(10000))).toThrow(RangeError);
+    expect(parse(stringify({ a: 1 }))).toEqual({ a: 1 });
   });
 });
