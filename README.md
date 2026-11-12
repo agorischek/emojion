@@ -34,12 +34,12 @@ array items are separated by `🤝`. A top-level object has no `👉` and `👈`
 document can also hold one array, string, number, boolean, or `null`.
 
 Keys are encoded with face emoji, such as `😠`, `🥺`, `😖`, `😺`, `😸`, and `😽`
-(`a`, `b`, `c`, `1`, `2`, `3` ). Capital letters are prefixed with `👠`. `🗝`
+(`a`, `b`, `c`, `1`, `2`, `3`). Capital letters are prefixed with `👠`. `🗝`
 represents an empty key.
 
 Strings are encoded with animals and plants, such as `🐜`, `🐝`, `🐄`, `🌷`,
-`🌱`, and `🌵` (`a`, `b`, `c`, `1`, `2`, `3` ). Capital letters are prefixed
-with `👡`. `🧵` represents an empty string.
+`🌱`, and `🌵` (`a`, `b`, `c`, `1`, `2`, `3`). Capital letters are prefixed with
+`👡`. `🧵` represents an empty string.
 
 Numbers are encoded with clocks, such as `🕛`, `🕐`, and `🕑` (`0`, `1`, `2`).
 Decimal points are encoded with `⛳️` and negative numbers are prefixed with `⏰`
