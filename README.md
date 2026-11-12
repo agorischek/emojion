@@ -106,7 +106,7 @@ When your coworker tells you YAML is "too hard to read".
 For a joke, Emojion takes its job surprisingly seriously. `parse()` and
 `stringify()` follow the same rules as `JSON.parse()` and `JSON.stringify()`,
 ship TypeScript types, have no runtime dependencies, and work in Node 10 and
-later. It's also fast, which nobody asked for.
+later. It's also fast.
 
 <details>
 <summary><code>parse(emojion)</code></summary>
