@@ -36,7 +36,7 @@
     "rollup": "rollup --config rollup.config.mjs",
     "watch": "npm run build -- --watch",
     "watch:test": "vitest",
-    "bench": "bun bench/index.ts"
+    "bench": "npm run build:lib && node --expose-gc bench/index.mjs"
   },
   "devDependencies": {
     "@emnapi/core": "^1.11.3",

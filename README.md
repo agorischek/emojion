@@ -105,4 +105,4 @@ When your coworker tells you YAML is "too hard to read".
 ## Tech
 
 Emojion has no runtime dependencies. It reads each document in a single pass
-with a hand-written parser. Run `bun run bench` to measure its speed.
+with a hand-written parser. Run `npm run bench` to measure its speed.
