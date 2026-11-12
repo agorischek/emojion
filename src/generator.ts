@@ -249,18 +249,32 @@ function encodeValue(value: unknown, depth: number): string | undefined {
 }
 
 /**
- * Write a value as an Emojion document, the way `JSON.stringify()` writes
- * JSON text. It follows the same rules: it calls `toJSON()`, unwraps boxed
- * primitives, writes `NaN` and `±Infinity` as `null`, skips `undefined`,
- * functions and symbols in objects and writes them as `null` in arrays.
+ * Write a value as an Emojion document, as `JSON.stringify()` writes JSON
+ * text, following the same rules:
  *
- * Throws a `TypeError` for a BigInt, a circular structure, or a value that
- * Emojion cannot hold at all (`undefined`, a function or a symbol), and a
- * `RangeError` for nesting deeper than 512 levels.
+ * - It calls a value's `toJSON(key)` method, so a `Date` becomes its ISO
+ *   string.
+ * - It unwraps `new Number()`, `new String()` and `new Boolean()`.
+ * - It writes `NaN`, `Infinity` and `-Infinity` as `null`, and `-0` as `0`.
+ * - It skips `undefined`, functions and symbols in objects, and writes them
+ *   (and array holes) as `null` in arrays.
+ * - It writes only own enumerable string keys.
+ *
+ * @param value - The value to write.
+ * @returns The Emojion document, from `🙌` to `✋`.
+ * @throws {TypeError} For a BigInt (unless `BigInt.prototype.toJSON` is
+ * defined), for a circular structure, and for a value Emojion cannot hold at
+ * all: `undefined`, a function or a symbol on its own. (`JSON.stringify()`
+ * returns `undefined` for those; every Emojion document holds a value.)
+ * @throws {RangeError} If arrays and objects nest more than 512 levels deep.
  *
  * @example
  * stringify({ created: 2019 });
  * //=> '🙌😖😭😳😠😛😳🤤🕑🕛🕐🕘✋'
+ *
+ * @example
+ * stringify([1, undefined, new Date(0)]);
+ * //=> the same document as stringify([1, null, '1970-01-01T00:00:00.000Z'])
  */
 export const stringify = (value: unknown): string => {
   // A toJSON() method may call stringify() itself, so keep the outer stack.

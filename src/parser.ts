@@ -327,16 +327,31 @@ function value(): Json {
 }
 
 /**
- * Parse an Emojion document into the value it holds, the way `JSON.parse()`
- * parses JSON text. Throws a `SyntaxError` if the document is not valid
- * Emojion.
+ * Parse an Emojion document into the value it holds, as `JSON.parse()` parses
+ * JSON text.
+ *
+ * Objects come back as plain objects and arrays as plain arrays. A key that
+ * `Object.prototype` has, such as `__proto__`, becomes an ordinary own
+ * property and never changes the prototype. When a key repeats, the last
+ * value wins.
+ *
+ * @param emojion - The document, from `🙌` to `✋`. Whitespace and U+FE0F
+ * variation selectors anywhere in it are ignored.
+ * @returns The object, array, string, number, boolean or `null` it holds.
+ * @throws {SyntaxError} If the document is not valid Emojion, naming the
+ * unexpected emoji and its position, or if it nests arrays and objects more
+ * than 512 levels deep.
  *
  * @example
  * parse('🙌😶😠🤑😳👡🐘🐁🦉🦒🐖🦉🦏✋');
  * //=> { name: 'Emojion' }
+ *
+ * @example
+ * parse('🙌🤜🕐🤝💚🤝🕳🤛✋');
+ * //=> [1, true, null]
  */
-export const parse = (input: string): Json => {
-  source = input;
+export const parse = (emojion: string): Json => {
+  source = emojion;
   index = 0;
   depth = 0;
   try {
