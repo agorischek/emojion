@@ -1,9 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { bench, do_not_optimize, group, run, summary } from 'mitata';
 
-import { generate, parse } from '../src/index';
+import { generate, parse } from '../lib/index.js';
 
-const read = (file: string) =>
+const read = (file) =>
   JSON.stringify(
     JSON.parse(
       readFileSync(new URL(`../test/docs/${file}`, import.meta.url), 'utf8')
