@@ -39,7 +39,8 @@ const emojion = generate(JSON.stringify({ created: 2019 }));
 ```
 
 Both functions use JSON text so every valid JSON value can round-trip without
-losing type information.
+losing type information. `parse()` throws a `SyntaxError` if its input is not
+valid Emojion.
 
 ## Syntax
 
@@ -48,7 +49,8 @@ Emojion, you're a winner in this author's eyes. Emojion documents end with `✋`
 — because... stop.
 
 Objects are enclosed by `👉` and `👈`, arrays are enclosed by `🤜` and `🤛`, and
-array items are separated by `🤝`.
+array items are separated by `🤝`. A top-level object has no `👉` and `👈`. A
+document can also hold one array, string, number, boolean, or `null`.
 
 Keys are encoded with face emoji, such as `😠`, `🥺`, `😖`, `😺`, `😸`, and `😽`
 (`a`, `b`, `c`, `1`, `2`, `3` ). Capital letters are prefixed with `👠`. `🗝`
@@ -58,9 +60,10 @@ Strings are encoded with animals and plants, such as `🐜`, `🐝`, `🐄`, `�
 `🌱`, and `🌵` (`a`, `b`, `c`, `1`, `2`, `3` ). Capital letters are prefixed
 with `👡`. `🧵` represents an empty string.
 
-Numbers are encoded with with clocks, such as `🕛`, `🕐`, and `🕑` (`0`, `1`,
-`2`). Decimal points are encoded with `⛳️` and negative numbers are prefixed
-with `⏰` (because alarms are annoying).
+Numbers are encoded with clocks, such as `🕛`, `🕐`, and `🕑` (`0`, `1`, `2`).
+Decimal points are encoded with `⛳️` and negative numbers are prefixed with `⏰`
+(because alarms are annoying). Exponents are prefixed with `🚀` (because they
+make numbers take off), so `1e-7` is `🕐🚀⏰🕖`.
 
 `💚` is `true`, `💔` is `false`, and `🕳` is `null`.
 
@@ -68,6 +71,8 @@ In keys, Unicode characters can be encoded using `🌎` followed by fruit, such 
 `🌎🍏🍊🍈🍓` for `U+0398` (which is `Θ`). In values, Unicode characters are
 encoded using `🗺` followed by office supplies, such as `🗺🖋🖊🧷🔎` for `U+0394`
 (which is `Δ`).
+
+Whitespace and emoji variation selectors are ignored.
 
 See [`characters.ts`](./src/characters.ts) for the full character map.
 
@@ -99,9 +104,8 @@ When your coworker tells you YAML is "too hard to read".
 
 ## Tech
 
-Emojion is built with the excellent
-[Moo lexer](https://www.npmjs.com/package/moo) and
-[Nearley parser](https://nearley.js.org) engines.
+Emojion has no runtime dependencies. It reads each document in a single pass
+with a hand-written parser. Run `bun run bench` to measure its speed.
 
 ## Publishing
 

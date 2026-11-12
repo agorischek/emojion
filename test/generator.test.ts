@@ -110,4 +110,34 @@ describe('Generator', () => {
     const generated = generate('{"L":"X"}');
     expect(generated).toBe('🙌👠🥰👡🐂✋');
   });
+
+  test('Should return a root string', () => {
+    const generated = generate('"Hi"');
+    expect(generated).toBe('🙌👡🦔🐖✋');
+  });
+
+  test('Should return a root empty string', () => {
+    const generated = generate('""');
+    expect(generated).toBe('🙌🧵✋');
+  });
+
+  test('Should return a root number', () => {
+    const generated = generate('-42');
+    expect(generated).toBe('🙌⏰🕓🕑✋');
+  });
+
+  test('Should return a positive exponent', () => {
+    const generated = generate('{"a":1e21}');
+    expect(generated).toBe('🙌😠🕐🚀🕑🕐✋');
+  });
+
+  test('Should return a negative exponent', () => {
+    const generated = generate('{"a":1.5e-7}');
+    expect(generated).toBe('🙌😠🕐⛳️🕔🚀⏰🕖✋');
+  });
+
+  test('Should encode JSON escapes as unicode', () => {
+    const generated = generate('{"a":"\\"\\n"}');
+    expect(generated).toBe('🙌😠🗺🖍🖍🗺📎✋');
+  });
 });
