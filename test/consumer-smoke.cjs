@@ -32,3 +32,13 @@ assert.deepStrictEqual(Object.keys(proto), ['__proto__']);
 assert.throws(function () {
   emj.parse('🙌💩✋');
 }, SyntaxError);
+
+var circular = {};
+circular.self = circular;
+assert.throws(function () {
+  emj.stringify(circular);
+}, TypeError);
+assert.throws(function () {
+  emj.stringify(undefined);
+}, TypeError);
+assert.strictEqual(typeof emj.generate, 'undefined');

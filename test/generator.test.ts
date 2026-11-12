@@ -361,4 +361,27 @@ describe('Stringify', () => {
     expect(stringify({ toJSON: () => ({ a: 'a' }) })).toBe('🙌😠🐜✋');
     expect(stringify(new Number(2))).toBe('🙌🕑✋');
   });
+  test('Should encode text the same as its characters one at a time', () => {
+    // Text is encoded two ASCII characters at a time where it can, so check
+    // odd lengths and ASCII next to non-ASCII against one character at a time.
+    const body = (value: unknown) =>
+      stringify(value).slice('🙌'.length, -'✋'.length);
+    const value = (text: string) => body(text);
+    const key = (text: string) => body({ [text]: 0 }).slice(0, -'🕛'.length);
+    const texts = [
+      'a',
+      'aB',
+      'a b',
+      ' é',
+      'é ',
+      'x😀',
+      '😀x',
+      'a😀b c',
+      '\u0000~',
+    ];
+    for (const text of texts) {
+      expect(value(text)).toBe(Array.from(text, value).join(''));
+      expect(key(text)).toBe(Array.from(text, key).join(''));
+    }
+  });
 });
