@@ -3,52 +3,99 @@ import { MAX_DEPTH } from './limits';
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 
-const KEYS = Array.from({ length: 128 }, () => '');
-const VALUES = Array.from({ length: 128 }, () => '');
-
-for (const [char, emoji] of Object.entries(characters.keys.letters)) {
-  KEYS[char.charCodeAt(0)] = emoji;
-  KEYS[char.toUpperCase().charCodeAt(0)] =
-    characters.keys.modifiers.upperCase + emoji;
-}
-for (const [char, emoji] of Object.entries(characters.keys.numerals)) {
-  KEYS[char.charCodeAt(0)] = emoji;
-}
-for (const [char, emoji] of Object.entries(characters.values.letters)) {
-  VALUES[char.charCodeAt(0)] = emoji;
-  VALUES[char.toUpperCase().charCodeAt(0)] =
-    characters.values.modifiers.upperCase + emoji;
-}
-for (const [char, emoji] of Object.entries(characters.values.numerals)) {
-  VALUES[char.charCodeAt(0)] = emoji;
+/**
+ * How to write text as either keys or values. `ascii` holds the emoji for
+ * every ASCII character, including the escape sequence for those without
+ * their own emoji, so ASCII text never takes the slower escape path.
+ * `pairs` caches two ASCII characters at once; it is filled in as pairs are
+ * first seen and holds at most 128 × 128 entries.
+ */
+interface Alphabet {
+  ascii: string[];
+  pairs: string[];
+  unicode: string;
+  nibbles: string[];
 }
 
-const KEY_NIBBLES: Record<string, string> = characters.keys.unicode;
-const VALUE_NIBBLES: Record<string, string> = characters.values.unicode;
+function makeAlphabet(
+  letters: Record<string, string>,
+  numerals: Record<string, string>,
+  modifiers: { upperCase: string; unicode: string },
+  hex: Record<string, string>
+): Alphabet {
+  const result: Alphabet = {
+    ascii: [],
+    pairs: new Array(128 * 128),
+    unicode: modifiers.unicode,
+    nibbles: Array.from({ length: 16 }, (_, i) => hex[i.toString(16)]),
+  };
+  for (let c = 0; c < 128; c++) result.ascii[c] = escapeSequence(c, result);
+  for (const [char, emoji] of Object.entries(letters)) {
+    result.ascii[char.charCodeAt(0)] = emoji;
+    result.ascii[char.toUpperCase().charCodeAt(0)] =
+      modifiers.upperCase + emoji;
+  }
+  for (const [char, emoji] of Object.entries(numerals)) {
+    result.ascii[char.charCodeAt(0)] = emoji;
+  }
+  return result;
+}
 
-const NUMBERS: Record<string, string> = {
+const KEYS = makeAlphabet(
+  characters.keys.letters,
+  characters.keys.numerals,
+  characters.keys.modifiers,
+  characters.keys.unicode
+);
+const VALUES = makeAlphabet(
+  characters.values.letters,
+  characters.values.numerals,
+  characters.values.modifiers,
+  characters.values.unicode
+);
+
+// Indexed by the char codes of String(number).
+const NUMBERS: string[] = [];
+for (const [char, emoji] of Object.entries({
   ...characters.values.numbers,
   '-': characters.values.modifiers.negative,
   '+': '',
-};
+})) {
+  NUMBERS[char.charCodeAt(0)] = emoji;
+}
 
-function encode(
-  text: string,
-  table: string[],
-  unicode: string,
-  nibbles: Record<string, string>
-): string {
+/** The escape for a code point: the unicode modifier, then its hex digits. */
+function escapeSequence(point: number, alphabet: Alphabet): string {
+  let shift = 20;
+  while (shift > 0 && point >> shift === 0) shift -= 4;
+  let out = alphabet.unicode;
+  for (; shift >= 0; shift -= 4) out += alphabet.nibbles[(point >> shift) & 15];
+  return out;
+}
+
+function encode(text: string, alphabet: Alphabet): string {
+  const { ascii, pairs } = alphabet;
   let out = '';
-  for (let i = 0; i < text.length; i++) {
-    const emoji = table[text.charCodeAt(i)];
-    if (emoji) {
-      out += emoji;
+  let i = 0;
+  while (i < text.length) {
+    const c = text.charCodeAt(i);
+    if (c < 128) {
+      const d = i + 1 < text.length ? text.charCodeAt(i + 1) : 128;
+      if (d < 128) {
+        const pair = (c << 7) | d;
+        let emoji = pairs[pair];
+        if (emoji === undefined) emoji = pairs[pair] = ascii[c] + ascii[d];
+        out += emoji;
+        i += 2;
+      } else {
+        out += ascii[c];
+        i++;
+      }
       continue;
     }
     const point = text.codePointAt(i)!;
-    if (point > 0xffff) i++;
-    out += unicode;
-    for (const hex of point.toString(16)) out += nibbles[hex];
+    i += point > 0xffff ? 2 : 1;
+    out += escapeSequence(point, alphabet);
   }
   return out;
 }
@@ -65,9 +112,7 @@ function nest(depth: number): number {
 function encodeObject(object: { [key: string]: Json }, depth: number): string {
   let out = '';
   for (const key of Object.keys(object)) {
-    out += key
-      ? encode(key, KEYS, characters.keys.modifiers.unicode, KEY_NIBBLES)
-      : characters.keys.other.empty;
+    out += key ? encode(key, KEYS) : characters.keys.other.empty;
     out += encodeValue(object[key], depth);
   }
   return out;
@@ -75,18 +120,14 @@ function encodeObject(object: { [key: string]: Json }, depth: number): string {
 
 function encodeValue(value: Json, depth: number): string {
   if (typeof value === 'string') {
-    return value
-      ? encode(
-          value,
-          VALUES,
-          characters.values.modifiers.unicode,
-          VALUE_NIBBLES
-        )
-      : characters.values.other.emptyString;
+    return value ? encode(value, VALUES) : characters.values.other.emptyString;
   }
   if (typeof value === 'number') {
+    const digits = String(value);
     let out = '';
-    for (const char of String(value)) out += NUMBERS[char];
+    for (let i = 0; i < digits.length; i++) {
+      out += NUMBERS[digits.charCodeAt(i)];
+    }
     return out;
   }
   if (typeof value === 'boolean') {
