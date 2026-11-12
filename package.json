@@ -19,6 +19,7 @@
     "lib"
   ],
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "clean": "rimraf lib && rimraf coverage",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.{ts,cjs}\" README.md",
