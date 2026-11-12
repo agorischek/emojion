@@ -1,35 +1,33 @@
-import { readFileSync } from 'node:fs';
-import { bench, do_not_optimize, group, run, summary } from 'mitata';
+// A readable report of the current build (lib/) on the whole corpus.
+// To compare two versions, use bench/ab.mjs instead: absolute numbers from
+// separate runs of this file are not comparable to within 10% or so.
+import { bench, do_not_optimize, group, run } from 'mitata';
 
 import { generate, parse } from '../lib/index.js';
+import { corpus } from './corpus.mjs';
 
-const read = (file) =>
-  JSON.stringify(
-    JSON.parse(
-      readFileSync(new URL(`../test/docs/${file}`, import.meta.url), 'utf8')
-    )
-  );
+// `+=` builds ropes, and V8 defers the cost of flattening one until the
+// string is read. Every real consumer reads it, so the benchmark does too.
+const flat = (s) => (s.charCodeAt(s.length >> 1), s);
 
-const large = read('3.json');
-const docs = {
-  small: read('1.json'),
-  medium: read('2.json'),
-  large,
-  xlarge: JSON.stringify(Array.from({ length: 8 }, () => JSON.parse(large))),
-};
-
-for (let [name, json] of Object.entries(docs)) {
-  let emojion = generate(json);
-  if (parse(emojion) !== json) throw new Error(`round-trip failed: ${name}`);
+const docs = corpus(generate);
+console.log('doc       json chars  emojion chars');
+for (const doc of docs) {
+  if (parse(doc.emojion) !== doc.expected)
+    throw new Error(`parse failed: ${doc.name}`);
+  if (parse(generate(doc.json)) !== doc.expected)
+    throw new Error(`round-trip failed: ${doc.name}`);
   console.log(
-    `${name}: ${json.length} chars json, ${emojion.length} chars emojion`
+    `${doc.name.padEnd(9)} ${String(doc.json.length).padStart(10)} ${String(doc.emojion.length).padStart(14)}`
   );
+}
 
+for (const { name, json, emojion } of docs) {
   group(name, () => {
-    summary(() => {
-      bench('generate', () => do_not_optimize(generate(json))).gc('inner');
-      bench('parse', () => do_not_optimize(parse(emojion))).gc('inner');
-    });
+    // generate() starts with JSON.parse; this row is that share of its time.
+    bench('JSON.parse', () => do_not_optimize(JSON.parse(json)));
+    bench('generate', () => do_not_optimize(flat(generate(json))));
+    bench('parse', () => do_not_optimize(flat(parse(emojion))));
   });
 }
 
