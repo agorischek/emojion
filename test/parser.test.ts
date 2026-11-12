@@ -297,6 +297,12 @@ describe('Parser', () => {
     validateJSON(parsed);
   });
 
+  test('Should parse unicode escapes padded to six nibbles', () => {
+    expect(parse('🙌😠🗺🖋🖋🖋🖋🖋🖌✋')).toBe('{"a":"\\u0001"}');
+    expect(parse('🙌🌎🍏🍏🍏🍊🍈🍓🐜✋')).toBe('{"Θ":"a"}');
+    expect(parse('🙌😠🗺🖌🖋📋📋📋📋✋')).toBe('{"a":"\u{10ffff}"}');
+  });
+
   test('Should parse a document with variation selectors', () => {
     const document = '🙌😠🕳\ufe0f🥺🕐⛳\ufe0f🕐✋';
     const parsed = parse(document);
@@ -317,7 +323,13 @@ describe('Parser', () => {
     ['a value without a key', '🙌😠🐜🕐✋', /Unexpected "🕐"/],
     ['an upper case numeral', '🙌😠👡🌷✋', /Unexpected "🌷"/],
     ['a unicode modifier without nibbles', '🙌😠🗺✋', /Unexpected "✋"/],
-    ['a code point that is too large', '🙌😠🗺🖌🖋🖋🖋🖋🖋🖋✋', /Unexpected "🖋"/],
+    ['a code point that is too large', '🙌😠🗺🖌🖌🖋🖋🖋🖋✋', /Unexpected "🖋"/],
+    ['a value escape over six nibbles', '🙌😠🗺🖋🖋🖋🖋🖋🖋🖌✋', /Unexpected "🖌"/],
+    [
+      'a key escape over six nibbles',
+      '🙌🌎🍏🍏🍏🍏🍏🍏🍎🐜✋',
+      /Unexpected "🍎"/,
+    ],
     ['a leading zero', '🙌😠🕛🕐✋', /Unexpected "🕐"/],
     ['a decimal without digits', '🙌😠🕐⛳️✋', /Unexpected "✋"/],
     ['an unclosed array', '🙌😠🤜🕐✋', /Unexpected "✋"/],

@@ -154,8 +154,11 @@ function text(
     } else if (kind === unicode) {
       next();
       if (kind !== nibble) fail();
+      // U+10FFFF, the highest code point, needs six nibbles.
       let value = 0;
+      let nibbles = 0;
       do {
+        if (++nibbles > 6) fail();
         value = value * 16 + code;
         if (value > 0x10ffff) fail();
         next();
