@@ -91,4 +91,20 @@ describe('Library', () => {
       expect(parse(generate(json))).toBe(json);
     }
   });
+
+  test('should round-trip nesting up to the limit', () => {
+    const arrays = '['.repeat(512) + ']'.repeat(512);
+    const objects = '{' + '"a":{'.repeat(511) + '}'.repeat(512);
+    expect(parse(generate(arrays))).toBe(arrays);
+    expect(parse(generate(objects))).toBe(objects);
+  });
+
+  test('should refuse to generate nesting past the limit', () => {
+    const json = '['.repeat(513) + ']'.repeat(513);
+    expect(() => generate(json)).toThrow(RangeError);
+    expect(() => generate(json)).toThrow(/nesting exceeds 512 levels/);
+    expect(() => generate('['.repeat(10000) + ']'.repeat(10000))).toThrow(
+      RangeError
+    );
+  });
 });

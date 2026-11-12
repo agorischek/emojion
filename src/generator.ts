@@ -1,4 +1,5 @@
 import { characters } from './characters';
+import { MAX_DEPTH } from './limits';
 
 type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 
@@ -52,18 +53,27 @@ function encode(
   return out;
 }
 
-function encodeObject(object: { [key: string]: Json }): string {
+function nest(depth: number): number {
+  if (depth >= MAX_DEPTH) {
+    throw new RangeError(
+      `JSON nesting exceeds ${MAX_DEPTH} levels, the most Emojion supports`
+    );
+  }
+  return depth + 1;
+}
+
+function encodeObject(object: { [key: string]: Json }, depth: number): string {
   let out = '';
   for (const key of Object.keys(object)) {
     out += key
       ? encode(key, KEYS, characters.keys.modifiers.unicode, KEY_NIBBLES)
       : characters.keys.other.empty;
-    out += encodeValue(object[key]);
+    out += encodeValue(object[key], depth);
   }
   return out;
 }
 
-function encodeValue(value: Json): string {
+function encodeValue(value: Json, depth: number): string {
   if (typeof value === 'string') {
     return value
       ? encode(
@@ -85,17 +95,18 @@ function encodeValue(value: Json): string {
       : characters.values.booleans.false;
   }
   if (value === null) return characters.values.other.null;
+  const inner = nest(depth);
   if (Array.isArray(value)) {
     let out = characters.document.arrayOpen;
     for (let i = 0; i < value.length; i++) {
       if (i) out += characters.document.arrayDelimit;
-      out += encodeValue(value[i]);
+      out += encodeValue(value[i], inner);
     }
     return out + characters.document.arrayClose;
   }
   return (
     characters.document.indent +
-    encodeObject(value) +
+    encodeObject(value, inner) +
     characters.document.outdent
   );
 }
@@ -111,7 +122,7 @@ export const generate = (input: string): string => {
   const value: Json = JSON.parse(input);
   const body =
     value && typeof value === 'object' && !Array.isArray(value)
-      ? encodeObject(value)
-      : encodeValue(value);
+      ? encodeObject(value, 0)
+      : encodeValue(value, 0);
   return characters.document.start + body + characters.document.end;
 };

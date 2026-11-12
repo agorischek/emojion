@@ -72,7 +72,8 @@ In keys, Unicode characters can be encoded using `🌎` followed by fruit, such 
 encoded using `🗺` followed by office supplies, such as `🗺🖋🖊🧷🔎` for `U+0394`
 (which is `Δ`).
 
-Whitespace and emoji variation selectors are ignored.
+Whitespace and emoji variation selectors are ignored. Arrays and objects can be
+nested up to 512 levels deep.
 
 See [`characters.ts`](./src/characters.ts) for the full character map.
 
